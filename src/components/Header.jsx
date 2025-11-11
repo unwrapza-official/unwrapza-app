@@ -3,13 +3,24 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faBars, faTimes, faCircleUser, faCalendarDays, faMagnifyingGlass, faEye, faCaretDown } from '@fortawesome/free-solid-svg-icons'
 import CategoriesDropDown from './CategoriesDropDown'
 import { Link } from 'react-router-dom'
+import Sidebar from "./Sidebar";
 
 
 const Header = () => {
-    const [menuOpen, setMenuOpen] = useState(false);
+
     const [categoriesMenuOpen, setCategoriesMenuOpen] = useState(false);
+    const [isSideBarOpen, setIsSidebarOpen] = useState(false);
     const [headerHeight, setHeaderHeight] = useState(0);
     const headerRef = useRef(null);
+
+    const categories = [
+        "Tech Gifts",
+        "Fashion",
+        "Home & Living",
+        "Toys",
+        "Personalized",
+        "Eco-Friendly",
+    ];
 
     useEffect(() => {
         if(headerRef.current) setHeaderHeight(headerRef.current.offsetHeight);
@@ -45,12 +56,21 @@ const Header = () => {
                             
                             {/* Hamburger + Logo (mobiel) */}
                             <div className="flex w-1/3 justify-start items-center gap-2 md:hidden">
-                            <button onClick={() => setMenuOpen(!menuOpen)}>
+                            <button onClick={() => setIsSidebarOpen(!isSideBarOpen)}>
                                 <FontAwesomeIcon
-                                icon={menuOpen ? faTimes : faBars}
+                                icon={isSideBarOpen ? faTimes : faBars}
                                 className="text-[#44A77D] text-3xl"
                                 />
                             </button>
+                            
+                            {/* Sidebar-component */}
+                            <Sidebar
+                                isOpen={isSideBarOpen}
+                                onClose={() => setIsSidebarOpen(false)}
+                                categories={categories}
+                                headerHeight={headerHeight}
+                            />
+
                             <h1 className="text-[#44A77D] font-bold text-3xl font-roboto hover:cursor-pointer">
                                 Unwrapza
                             </h1>

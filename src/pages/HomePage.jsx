@@ -1,6 +1,6 @@
 import React from 'react';
 import UnwrapzaAI from '../components/UnwrapzaAI/UnwrapzaAI';
-import HomePageProductsComponent from '../components/HomePageProductsComponent';
+import HomePageProductsComponent from '../components/HomePageProductGrid';
 
 const HomePage = () => {
 

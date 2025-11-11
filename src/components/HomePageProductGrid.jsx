@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { collection, getDocs, addDoc } from "firebase/firestore";
 import  {useUserCountry } from "../hooks/useUserCountry.js";
-import { db } from "../firebase";
+import { db } from "../firebase.js";
 
 const HomePageProductsComponent = () => {
 
@@ -38,7 +38,6 @@ const HomePageProductsComponent = () => {
             }
         };
         fetchProducts();
-
     }, [])
 
     const handleClick = async (product) => {
@@ -80,22 +79,32 @@ const HomePageProductsComponent = () => {
                             </p>
                         </div>
                         ) : (
-                        <div className="w-full mb-[100px] grid grid-cols-2 md:grid-cols-4 gap-12">
-                            {products.map((product) => (
-                            <div 
-                            key={product.id} 
-                            className="flex flex-col hover:shadow-xl transition"
+                        <div className="w-full mb-[100px] grid grid-cols-2 md:grid-cols-4 gap-10">
+                        {products.map((product) => (
+                            <div
+                            key={product.id}
                             onClick={() => handleClick(product)}
+                            className="group flex flex-col items-center rounded-2xl p-5 bg-white border border-gray-200 shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300 cursor-pointer"
                             >
-                                <img 
-                                src={product.image} 
-                                alt={product.name} 
-                                className="p-5 aspect-square object-contain rounded-xl" />
-                                <p className="mt-2 text-gray-500">{product.platform}</p>
-                                <h3 className="font-semibold text-lg text-gray-800">{product.name}</h3>
-                                <h2>{product.price}</h2>
+                            <div className="w-full aspect-square overflow-hidden rounded-xl bg-gray-50 flex items-center justify-center">
+                                <img
+                                src={product.image}
+                                alt={product.name}
+                                className="w-3/4 h-3/4 object-contain transition-transform duration-500 group-hover:scale-105"
+                                />
                             </div>
-                            ))}
+
+                            <div className="w-full text-center mt-4">
+                                <p className="text-sm text-gray-400">{product.platform}</p>
+                                <h3 className="mt-1 font-semibold text-gray-800 text-base leading-snug">
+                                {product.name}
+                                </h3>
+                                <h2 className="mt-2 font-semibold text-gray-700 text-lg">
+                                {product.price}
+                                </h2>
+                            </div>
+                            </div>
+                        ))}
                         </div>
                     )}
                 </div>

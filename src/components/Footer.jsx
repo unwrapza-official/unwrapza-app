@@ -1,108 +1,189 @@
 var currentYear = new Date().getFullYear();
 
 const Footer = () => {
-    return(
-        <footer className="w-full">
-            {/* Top Colors */}
-            <div className="w-full h-1.5 flex justify-evenly">
-                <div className="flex-1 h-full" style={{ backgroundColor: "#FFFB84" }}></div>
-                <div className="flex-1 h-full" style={{ backgroundColor: "#84FF96" }}></div>
-                <div className="flex-1 h-full" style={{ backgroundColor: "#84F3FF" }}></div>
-                <div className="flex-1 h-full" style={{ backgroundColor: "#84B9FF" }}></div>
-                <div className="flex-1 h-full" style={{ backgroundColor: "#9084FF" }}></div>
-                <div className="flex-1 h-full" style={{ backgroundColor: "#DC84FF" }}></div>
-                <div className="flex-1 h-full" style={{ backgroundColor: "#FF84F7" }}></div>
-                <div className="flex-1 h-full" style={{ backgroundColor: "#FF787A" }}></div>
-            </div>
+  return (
+    <footer className="w-full bg-white">
+      {/* 🌈 Top Colors */}
+      <div className="w-full h-1 flex">
+        <div className="flex-1" style={{ backgroundColor: "#FFFB84" }}></div>
+        <div className="flex-1" style={{ backgroundColor: "#84FF96" }}></div>
+        <div className="flex-1" style={{ backgroundColor: "#84F3FF" }}></div>
+        <div className="flex-1" style={{ backgroundColor: "#84B9FF" }}></div>
+        <div className="flex-1" style={{ backgroundColor: "#9084FF" }}></div>
+        <div className="flex-1" style={{ backgroundColor: "#DC84FF" }}></div>
+        <div className="flex-1" style={{ backgroundColor: "#FF84F7" }}></div>
+        <div className="flex-1" style={{ backgroundColor: "#FF787A" }}></div>
+      </div>
 
-            {/* Top Footer */}
-            <div className="md:max-w-[1200px] min-h-[300px] mx-auto flex flex-col md:flex-row flex-wrap mt-[30px] gap-10 px-4 md:px-0">
-                {/* Need Help */}
-                <div className="flex-1 flex flex-col gap-5 text-center md:text-left items-center md:items-start">
-                    <h1 className="font-semibold text-[20px]">
-                        Need help?
-                    </h1>
-                    <button className="border-2 border-[#44A77D] w-[200px] h-[50px] font-semibold hover:cursor-pointer hover:bg-[#44A77D] hover:text-white transition">
-                        Contact us
-                    </button>
-                </div>
+      {/* 💬 Top Section */}
+      <div className="max-w-[1200px] mx-auto px-6 sm:px-8 md:px-10 py-12 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-10 border-b border-gray-100">
+        {/* Help Section */}
+        <div className="flex flex-col items-center sm:items-start text-center sm:text-left space-y-4">
+          <h2 className="font-semibold text-[22px] text-gray-800">Need help?</h2>
+          <p className="text-gray-500 text-sm max-w-[260px] sm:max-w-full">
+            Our support team is happy to assist you with anything related to Unwrapza.
+          </p>
+          <button className="border-2 border-[#44A77D] w-full sm:w-[200px] h-[48px] rounded-md font-semibold text-gray-800 hover:bg-[#44A77D] hover:text-white transition-all duration-300">
+            Contact us
+          </button>
+        </div>
 
-                {/* Pages */}
-                <div className="flex-1 flex flex-col gap-5 text-center md:text-left items-center md:items-start">
-                    <h1 className="font-semibold text-[20px]">
-                        Pages
-                    </h1>
-                    <ul className="w-auto space-y-2">
-                        <li><a href="/">About</a></li>
-                        <li><a href="/disclaimer">Disclaimer</a></li>
-                        <li><a href="/privacy">Privacy Policy</a></li>
-                    </ul>
-                </div>
+        {/* Pages Section */}
+        <div className="flex flex-col items-center sm:items-start text-center sm:text-left space-y-4">
+          <h2 className="font-semibold text-[22px] text-gray-800">Pages</h2>
+          <ul className="space-y-2 text-gray-600">
+            <li>
+              <a href="/" className="hover:text-[#44A77D] transition-colors">
+                About
+              </a>
+            </li>
+            <li>
+              <a href="/disclaimer" className="hover:text-[#44A77D] transition-colors">
+                Disclaimer
+              </a>
+            </li>
+            <li>
+              <a href="/privacy" className="hover:text-[#44A77D] transition-colors">
+                Privacy Policy
+              </a>
+            </li>
+          </ul>
+        </div>
 
-                {/* Newsletter */}
-                <div className="flex flex-1 flex-col gap-5 text-center md:text-left items-center md:items-start">
-                    <h1 className="font-semibold text-[20px]">
-                        Sign up for emails 
-                    </h1>
-                    <div className="flex sm:flex-row w-full justify-center md:justify-start gap-3 sm:gap-2">
-                        <input 
-                            type="email" 
-                            className="sm:w-[300px] h-[50px] border-1 pl-3 rounded-md focus:outline-none focus:ring-2 focus:ring-[#44A77D]" 
-                            placeholder="Your email"
-                        />
-                        <button className="bg-[#44A77D] text-white md:px-4 rounded-md font-semibold hover:bg-[#004a31] duration-200 w-full sm:w-auto">
-                            Sign up
-                        </button>
-                    </div>
-                </div>
-            </div>
+        {/* Newsletter */}
+        <div className="flex flex-col items-center sm:items-start text-center sm:text-left space-y-4">
+          <h2 className="font-semibold text-[22px] text-gray-800">Sign up for emails</h2>
+          <p className="text-gray-500 text-sm max-w-[300px]">
+            Get updates on new features, AI deals, and personalized gift ideas.
+          </p>
+          <div className="flex flex-col sm:flex-row gap-3 w-full sm:w-auto">
+            <input
+              type="email"
+              placeholder="Your email"
+              aria-label="Email address"
+              className="flex-1 h-[48px] border border-gray-300 rounded-md px-3 text-sm focus:outline-none focus:ring-2 focus:ring-[#44A77D] transition-all"
+            />
+            <button className="bg-[#44A77D] text-white font-semibold px-5 h-[48px] rounded-md hover:bg-[#004a31] transition-all">
+              Sign up
+            </button>
+          </div>
+        </div>
+      </div>
 
-            {/* Middle Footer */}
-            <div className="bg-[#44A77D] mt-8">
-                <div className="md:max-w-[1200px] mx-auto flex flex-col md:flex-row flex-wrap justify-between gap-8 p-6 text-white text-center md:text-left">
-                    <div className="flex-1 flex flex-col gap-3 min-w-[200px]">
-                        <h1 className="font-medium">Company</h1>
-                        <ul className="space-y-1">
-                            <li><a href="/about">About</a></li>
-                            <li><a href="/newsletter">Newsletter</a></li>
-                            <li><a href="/newsletter">Contact</a></li>
-                        </ul>
-                    </div>
+      {/* 🌿 Middle Footer */}
+      <div className="bg-[#44A77D] text-white">
+        <div className="max-w-[1200px] mx-auto px-6 sm:px-8 md:px-10 py-10 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-10 text-center sm:text-left">
+          {/* Company */}
+          <div>
+            <h3 className="uppercase text-xs tracking-widest text-white/80 font-semibold mb-3">
+              Company
+            </h3>
+            <ul className="space-y-2 text-sm">
+              <li>
+                <a href="/about" className="hover:opacity-80 transition-opacity">
+                  About
+                </a>
+              </li>
+              <li>
+                <a href="/newsletter" className="hover:opacity-80 transition-opacity">
+                  Newsletter
+                </a>
+              </li>
+              <li>
+                <a href="/contact" className="hover:opacity-80 transition-opacity">
+                  Contact
+                </a>
+              </li>
+            </ul>
+          </div>
 
-                    <div className="flex-1 flex flex-col gap-3 min-w-[200px]">
-                        <h2 className="font-medium">Legal</h2>
-                        <ul className="space-y-1">
-                            <li><a href="/privacy">Privacy Policy</a></li>
-                            <li><a href="/terms">Terms & Conditions</a></li>
-                            <li><a href="/disclaimer">Disclaimer</a></li>
-                        </ul>
-                    </div>
+          {/* Legal */}
+          <div>
+            <h3 className="uppercase text-xs tracking-widest text-white/80 font-semibold mb-3">
+              Legal
+            </h3>
+            <ul className="space-y-2 text-sm">
+              <li>
+                <a href="/privacy" className="hover:opacity-80 transition-opacity">
+                  Privacy Policy
+                </a>
+              </li>
+              <li>
+                <a href="/terms" className="hover:opacity-80 transition-opacity">
+                  Terms & Conditions
+                </a>
+              </li>
+              <li>
+                <a href="/disclaimer" className="hover:opacity-80 transition-opacity">
+                  Disclaimer
+                </a>
+              </li>
+            </ul>
+          </div>
 
-                    <div className="flex-1 flex flex-col gap-3 min-w-[200px]">
-                        <h2 className="font-medium">Connect</h2>
-                        <ul className="space-y-1">
-                            <li><a href="https://instagram.com/unwrapza" target="_blank" rel="noopener noreferrer">Instagram</a></li>
-                            <li><a href="https://tiktok.com/@unwrapza" target="_blank" rel="noopener noreferrer">Tiktok</a></li>
-                            <li><a href="https://x.com/unwrapza" target="_blank" rel="noopener noreferrer">X</a></li>
-                            <li><a href="mailto:info@unwrapza.com">Email</a></li>
-                        </ul>
-                    </div>
-                </div>
-            </div>
-            
-            {/* Bottom Footer */}
-            <div className="bg-[#44A77D]">
-                <div className="md:max-w-[1200px] mx-auto text-center py-4 px-4 md:px-0">
-                    <p className="text-white font-semibold">
-                        © {currentYear} Unwrapza
-                    </p>
-                    <p className="text-white text-xs opacity-80 mt-1 max-w-[800px] mx-auto">
-                        Unwrapza participates in various affiliate programs and may earn commissions from qualifying purchases made through links on this website.
-                    </p>
-                </div>
-            </div>
-        </footer>
-    )
-}
+          {/* Connect */}
+          <div>
+            <h3 className="uppercase text-xs tracking-widest text-white/80 font-semibold mb-3">
+              Connect
+            </h3>
+            <ul className="space-y-2 text-sm">
+              <li>
+                <a
+                  href="https://instagram.com/unwrapza"
+                  target="_blank"
+                  rel="noreferrer"
+                  className="hover:opacity-80 transition-opacity"
+                >
+                  Instagram
+                </a>
+              </li>
+              <li>
+                <a
+                  href="https://tiktok.com/@unwrapza"
+                  target="_blank"
+                  rel="noreferrer"
+                  className="hover:opacity-80 transition-opacity"
+                >
+                  Tiktok
+                </a>
+              </li>
+              <li>
+                <a
+                  href="https://x.com/unwrapza"
+                  target="_blank"
+                  rel="noreferrer"
+                  className="hover:opacity-80 transition-opacity"
+                >
+                  X
+                </a>
+              </li>
+              <li>
+                <a
+                  href="mailto:info@unwrapza.com"
+                  className="hover:opacity-80 transition-opacity"
+                >
+                  Email
+                </a>
+              </li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
+      {/* ⚖️ Bottom */}
+      <div className="bg-[#44A77D] border-t border-white/20">
+        <div className="max-w-[1200px] mx-auto text-center py-5 px-6">
+          <p className="text-white font-semibold text-sm">
+            © {currentYear} Unwrapza
+          </p>
+          <p className="text-white/90 text-xs mt-2 leading-relaxed max-w-[700px] mx-auto">
+            Unwrapza participates in affiliate programs and may earn commissions
+            from qualifying purchases made through links on this website.
+          </p>
+        </div>
+      </div>
+    </footer>
+  );
+};
 
 export default Footer;
