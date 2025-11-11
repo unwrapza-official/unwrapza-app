@@ -92,7 +92,7 @@ const Header = () => {
 
                             {/* Buttons (altijd tegen rechterkant) */}
                             <div className="absolute right-3 sm:right-0 top-1/2 -translate-y-1/2 flex gap-3 sm:gap-6 md:gap-8 items-end">
-                            <Link to="/Login" className="flex flex-col items-center">
+                            <Link to="/login" className="flex flex-col items-center">
                                 <FontAwesomeIcon
                                 icon={faCircleUser}
                                 className="text-[#44A77D] text-2xl sm:text-3xl md:text-4xl hover:scale-110 transition-transform duration-200"

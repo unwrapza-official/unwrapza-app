@@ -10,18 +10,18 @@ import ScrollToTop from './functions/ScrollToTop'
 function App() {
   const location = useLocation();
 
-  const disableHeader = location.pathname === '/Login'
+  const disableComponent = location.pathname === '/login'
   
   return (
     <>
-      {!disableHeader && <Header />}
+      {!disableComponent && <Header />}
       <ScrollToTop/>
       <Routes>
         <Route path="/" element={<HomePage />} />
-        <Route path="/Login" element={<LoginPage />} />
+        <Route path="/login" element={<LoginPage />} />
         <Route path="/*" element={<NotFoundPage/>} />
       </Routes>
-      <Footer/>
+      {!disableComponent && <Footer/>}
     </>
   )
 }
