@@ -16,8 +16,7 @@ const LoginPage = () => {
                 <div className="w-1/8 h-full" style={{ backgroundColor: "#FF84F7"}}></div>
                 <div className="w-1/8 h-full" style={{ backgroundColor: "#FF787A"}}></div>
             </div>
-            <div className="w-full h-[calc(100vh-10px)] bg-cover flex flex-col justify-center items-center" 
-               style={{ backgroundImage: `url(${loginBackground})` }}>
+            <div className="w-full h-screen bg-cover flex flex-col justify-center items-center">
                 <div className='w-[800px] h-[600px] bg-white flex flex-col  rounded-xl'>
 
                 </div>

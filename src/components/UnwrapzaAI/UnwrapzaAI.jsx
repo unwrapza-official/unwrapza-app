@@ -1,20 +1,88 @@
-import React from 'react';
 import AISearchComponent from './AISearchComponent';
 import AIResultComponent from './AIResultComponent';
+import { motion, AnimatePresence } from 'framer-motion';
+import { useEffect, useState } from 'react';
 
 const UnwrapzaAI = () => {
+
+    const [lastClick, setLastClick] = useState(0);
+    const [isVisible, setIsVisible] = useState(() => {
+        const saved = localStorage.getItem("giftFinder_isVisible");
+        return saved !== null ? saved === "true" : true; 
+    });
+
+    useEffect(() => {
+        localStorage.setItem("giftFinder_isVisible", isVisible);
+    }, [isVisible]);
+
+
+    const handleClick = () =>{
+        const now = Date.now();
+        if(now - lastClick < 900)return;
+        setLastClick(now);
+        setIsVisible(!isVisible);
+    }
+
     return (
         <>
-            <div className='w-full h-[calc(100vh-282px)] bg-[#60D8A5] flex flex-col md:flex-row'>
-                <AISearchComponent/>
-                <AIResultComponent/>
+            <div className='w-full h-[45px] bg-[#44A77D] flex justify-center'>
+                <div className='w-full h-full max-w-[1200px] flex justify-end items-center px-4 md:px-0'>
+                    <button 
+                       className='className="col-span-2 h-8 px-3 bg-green border-3
+                       text-white font-bold italic rounded-[6px]
+                       shadow-[3px_3px_0_#FFFFFF] hover:shadow-[0_0_0_#FFFFFF]
+                       hover:translate-x-[6px] hover:translate-y-[6px]
+                       transition-all duration-300 ease-out active:scale-95
+                       hover:cursor-pointer'
+                       onClick={handleClick}> 
+                        {isVisible ? "hide" : "open"}
+                    </button>
+                </div>
             </div>
-            <div className='w-full h-2.5 flex justify-evenly'>
-                <div className="w-1/3 h-full" style={{ backgroundColor: "#84F3FF"}}></div>
-                <div className="w-1/3 h-full" style={{ backgroundColor: "#DC84FF"}}></div>
-                <div className="w-1/3 h-full" style={{ backgroundColor: "#FF84F7"}}></div>
-            </div>
+
+            <AnimatePresence mode="wait">
+                {isVisible && (
+                <motion.div
+                    key="aiMain"
+                    initial={{ height: 0, opacity: 0, y: -80, borderRadius: "0 0 40px 40px" }}
+                    animate={{ height: "auto", opacity: 1, y: 0, borderRadius: "0 0 0 0" }}
+                    exit={{ height: 0, opacity: 0, y: -80, borderRadius: "0 0 40px 40px" }}
+                    transition={{
+                    duration: 0.8,
+                    ease: [0.22, 1, 0.36, 1], // smooth bezier curve voor natuurlijke roll
+                    }}
+                    className="overflow-hidden origin-top"
+                >
+                    <motion.div
+                    initial={{ y: -20 }}
+                    animate={{ y: 0 }}
+                    exit={{ y: -20 }}
+                    transition={{ duration: 0.5 }}
+                    className="w-full bg-[#60D8A5] flex justify-center"
+                    >
+                    <div className="md:max-w-[1200px] w-full flex flex-col md:flex-row gap-6 py-6">
+                        <AISearchComponent />
+                        <AIResultComponent />
+                    </div>
+                    </motion.div>
+
+                    {/* Bottom Colors */}
+                    <motion.div
+                    initial={{ y: 20, opacity: 0 }}
+                    animate={{ y: 0, opacity: 1 }}
+                    exit={{ y: -20, opacity: 0 }}
+                    transition={{ duration: 0.5 }}
+                    className="w-full h-2.5 flex"
+                    >
+                    <div className="flex-1 h-full" style={{ backgroundColor: '#84F3FF' }}></div>
+                    <div className="flex-1 h-full" style={{ backgroundColor: '#DC84FF' }}></div>
+                    <div className="flex-1 h-full" style={{ backgroundColor: '#FF84F7' }}></div>
+                    </motion.div>
+                </motion.div>
+                )}
+            </AnimatePresence>
         </>
-    )
-}
+    );
+};
+
 export default UnwrapzaAI;

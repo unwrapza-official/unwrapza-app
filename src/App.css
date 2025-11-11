@@ -1,10 +1,38 @@
 @import "tailwindcss";
 
-
-
 body {
   overflow-x: hidden;
   &::-webkit-scrollbar {
     display: none;
   }
+}
+
+/* Styling voor de native dropdown lijst */
+/* Algemene stijl voor dropdown-opties */
+select option {
+  background-color: #ffffff;        /* witte basisachtergrond */
+  color: #1f1f1f;                   /* iets zachter zwart voor prettige leesbaarheid */
+  font-weight: 600;
+  padding: 8px 12px;                /* meer ruimte in de lijst */
+  border-radius: 6px;               /* ronde hoeken voor modernere look */
+  transition: all 0.25s ease;       /* zachte animatie bij hover */
+}
+
+/* Hover- en focus-effect */
+select option:hover,
+select option:focus {
+  background-color: #84B9FF;        /* jouw Unwrapza-blauw */
+  color: #ffffff;
+  transform: scale(1.02);           /* mini-zoom bij hover voor tactiel gevoel */
+}
+
+/* Subtiele schaduw bij hover (AI-achtig effect) */
+select option:hover {
+  box-shadow: 0 2px 6px rgba(132, 185, 255, 0.4);
+}
+
+/* iOS / Safari fix: voorkomt rare grijze achtergrond bij selectie */
+select:focus > option:checked {
+  background: #84B9FF !important;
+  color: #ffffff !important;
 }
