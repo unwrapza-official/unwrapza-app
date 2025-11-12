@@ -33,6 +33,16 @@ const Header = () => {
         return () => window.removeEventListener('resize', handleResize);
     }, []);
 
+    const handleOpenSideBar = () => {
+    // 🔝 Scroll direct naar boven
+        window.scrollTo({ top: 0, behavior: "instant" });
+
+        // ⏳ Kleine delay zodat scroll eerst gebeurt voordat sidebar opent
+        setTimeout(() => {
+            setIsSidebarOpen(true);
+        }, 0);
+    };
+
     return(
         <header ref={headerRef} className="w-full">
             {/* Top Colors */}
@@ -56,10 +66,18 @@ const Header = () => {
                             
                             {/* Hamburger + Logo (mobiel) */}
                             <div className="flex w-1/3 justify-start items-center gap-2 md:hidden">
-                            <button onClick={() => setIsSidebarOpen(!isSideBarOpen)}>
+                            <button
+                                onClick={() => {
+                                    if (isSideBarOpen) {
+                                    setIsSidebarOpen(false);
+                                    } else {
+                                    handleOpenSideBar();
+                                    }
+                                }}
+                                >
                                 <FontAwesomeIcon
-                                icon={isSideBarOpen ? faTimes : faBars}
-                                className="text-[#44A77D] text-3xl"
+                                    icon={isSideBarOpen ? faTimes : faBars}
+                                    className="text-[#44A77D] text-3xl"
                                 />
                             </button>
                             

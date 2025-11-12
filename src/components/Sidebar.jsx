@@ -1,37 +1,47 @@
 import { motion, AnimatePresence } from "framer-motion";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { X } from "lucide-react";
 
 const Sidebar = ({ isOpen, onClose, categories = [], headerHeight = 0 }) => {
+  const [scrollY, setScrollY] = useState(0);
 
+  // 🧊 Lock scroll en bewaar positie
   useEffect(() => {
-  if (isOpen) {
-    const scrollY = window.scrollY;
-    document.body.style.position = 'fixed';
-    document.body.style.top = `-${scrollY}px`;
-    document.body.style.width = '100%';
-  } else {
-    const scrollY = document.body.style.top;
-    document.body.style.position = '';
-    document.body.style.top = '';
-    document.body.style.width = '';
-    window.scrollTo(0, parseInt(scrollY || '0') * -1);
-  }
+    if (isOpen) {
+      const currentScrollY = window.scrollY;
+      setScrollY(currentScrollY);
 
-  return () => {
-    document.body.style.position = '';
-    document.body.style.top = '';
-    document.body.style.width = '';
-    document.body.style.overflow = '';
-  };
-}, [isOpen]);
+      // Body "bevriezen"
+      document.body.style.position = "fixed";
+      document.body.style.top = `-${currentScrollY}px`;
+      document.body.style.width = "100%";
+      document.body.style.overflow = "hidden";
+    } else {
+      // Scrollpositie herstellen
+      const scrollYString = document.body.style.top;
+      document.body.style.position = "";
+      document.body.style.top = "";
+      document.body.style.width = "";
+      document.body.style.overflow = "";
+      window.scrollTo(0, parseInt(scrollYString || "0") * -1);
+    }
 
+    return () => {
+      document.body.style.position = "";
+      document.body.style.top = "";
+      document.body.style.width = "";
+      document.body.style.overflow = "";
+    };
+  }, [isOpen]);
+
+  // 🧭 Bereken de top-positie, zelfs na scrollen
+  const sidebarTop = headerHeight + scrollY;
 
   return (
     <AnimatePresence>
       {isOpen && (
         <>
-          {/* 🔳 Donkere overlay (onder de header) */}
+          {/* 🔳 Donkere overlay */}
           <motion.div
             className="fixed left-0 right-0 bottom-0 bg-black/40 z-40 md:hidden"
             style={{ top: `${headerHeight}px` }}
@@ -45,7 +55,7 @@ const Sidebar = ({ isOpen, onClose, categories = [], headerHeight = 0 }) => {
           <motion.aside
             className="fixed left-0 w-full sm:w-2/3 bg-white z-50 shadow-2xl flex flex-col md:hidden"
             style={{
-              top: `${headerHeight}px`,
+              top: `${sidebarTop}px`,
               height: `calc(100vh - ${headerHeight}px)`,
             }}
             initial={{ x: "-100%" }}
@@ -55,7 +65,9 @@ const Sidebar = ({ isOpen, onClose, categories = [], headerHeight = 0 }) => {
           >
             {/* Header */}
             <div className="flex items-center justify-between p-4 border-b border-gray-200">
-              <h2 className="text-lg text-[#44A77D] font-semibold italic">Unwrapza Menu</h2>
+              <h2 className="text-lg text-[#44A77D] font-semibold italic">
+                Unwrapza Menu
+              </h2>
               <button
                 onClick={onClose}
                 className="p-2 rounded-full hover:bg-gray-100 transition"
@@ -84,7 +96,9 @@ const Sidebar = ({ isOpen, onClose, categories = [], headerHeight = 0 }) => {
                   ))}
                 </ul>
               ) : (
-                <p className="text-gray-500 text-sm">No categories available.</p>
+                <p className="text-gray-500 text-sm">
+                  No categories available.
+                </p>
               )}
             </nav>
 
