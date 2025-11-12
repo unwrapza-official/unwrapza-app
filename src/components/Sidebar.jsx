@@ -35,7 +35,6 @@ const Sidebar = ({ isOpen, onClose, categories = [], headerHeight = 0 }) => {
   }, [isOpen]);
 
   // 🧭 Bereken de top-positie, zelfs na scrollen
-  const sidebarTop = headerHeight + scrollY;
 
   return (
     <AnimatePresence>
@@ -55,7 +54,7 @@ const Sidebar = ({ isOpen, onClose, categories = [], headerHeight = 0 }) => {
           <motion.aside
             className="fixed left-0 w-full sm:w-2/3 bg-white z-50 shadow-2xl flex flex-col md:hidden"
             style={{
-              top: `${sidebarTop}px`,
+              top: `${headerHeight}px`,
               height: `calc(100vh - ${headerHeight}px)`,
             }}
             initial={{ x: "-100%" }}
