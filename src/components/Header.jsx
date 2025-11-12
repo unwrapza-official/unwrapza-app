@@ -68,10 +68,10 @@ const Header = () => {
                             <div className="flex w-1/3 justify-start items-center gap-2 md:hidden">
                             <button
                                 onClick={() => {
-                                    if (isSideBarOpen) {
-                                    setIsSidebarOpen(false);
-                                    } else {
-                                    handleOpenSideBar();
+                                    if(isSideBarOpen){
+                                        setIsSidebarOpen(false);
+                                    } else{
+                                        handleOpenSideBar();
                                     }
                                 }}
                                 >

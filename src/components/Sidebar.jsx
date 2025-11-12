@@ -1,47 +1,27 @@
 import { motion, AnimatePresence } from "framer-motion";
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { X } from "lucide-react";
 
 const Sidebar = ({ isOpen, onClose, categories = [], headerHeight = 0 }) => {
-  const [scrollY, setScrollY] = useState(0);
-
-  // 🧊 Lock scroll en bewaar positie
+  // 🧊 Scroll blokkeren zolang sidebar open is
   useEffect(() => {
     if (isOpen) {
-      const currentScrollY = window.scrollY;
-      setScrollY(currentScrollY);
-
-      // Body "bevriezen"
-      document.body.style.position = "fixed";
-      document.body.style.top = `-${currentScrollY}px`;
-      document.body.style.width = "100%";
       document.body.style.overflow = "hidden";
     } else {
-      // Scrollpositie herstellen
-      const scrollYString = document.body.style.top;
-      document.body.style.position = "";
-      document.body.style.top = "";
-      document.body.style.width = "";
       document.body.style.overflow = "";
-      window.scrollTo(0, parseInt(scrollYString || "0") * -1);
     }
 
     return () => {
-      document.body.style.position = "";
-      document.body.style.top = "";
-      document.body.style.width = "";
       document.body.style.overflow = "";
     };
   }, [isOpen]);
 
-  // 🧭 Bereken de top-positie, zelfs na scrollen
-  const sidebarTop = headerHeight + scrollY;
 
   return (
     <AnimatePresence>
       {isOpen && (
         <>
-          {/* 🔳 Donkere overlay */}
+          {/* 🔳 Donkere overlay (onder header) */}
           <motion.div
             className="fixed left-0 right-0 bottom-0 bg-black/40 z-40 md:hidden"
             style={{ top: `${headerHeight}px` }}
@@ -55,7 +35,7 @@ const Sidebar = ({ isOpen, onClose, categories = [], headerHeight = 0 }) => {
           <motion.aside
             className="fixed left-0 w-full sm:w-2/3 bg-white z-50 shadow-2xl flex flex-col md:hidden"
             style={{
-              top: `${sidebarTop}px`,
+              top: `${headerHeight}px`,
               height: `calc(100vh - ${headerHeight}px)`,
             }}
             initial={{ x: "-100%" }}
