@@ -34,13 +34,11 @@ const Header = () => {
     }, []);
 
     const handleOpenSideBar = () => {
-    // 🔝 Scroll direct naar boven
-        window.scrollTo({ top: 0, behavior: "instant" });
+        window.scrollTo({ top: 0, behavior: "auto" });
 
-        // ⏳ Kleine delay zodat scroll eerst gebeurt voordat sidebar opent
         setTimeout(() => {
             setIsSidebarOpen(true);
-        }, 0);
+        }, 100);
     };
 
     return(
