@@ -5,8 +5,8 @@ import CategoriesDropDown from './CategoriesDropDown'
 import { Link } from 'react-router-dom'
 import Sidebar from "./Sidebar";
 import unwrapza from "../assets/unwrapza.png"
-import for_her from "../assets/categories/for_her.png"
-import for_him from "../assets/categories/for_him.png"
+import for_her from "../assets/categories/For_her.png"
+import for_him from "../assets/categories/For_him.png"
 import tech_gifts from "../assets/categories/Tech_gifts.png"
 import home_living from "../assets/categories/Home_living.png"
 import funny_gifts from "../assets/categories/funny_gifts.png"
