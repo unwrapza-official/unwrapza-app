@@ -1,37 +1,44 @@
+/* ✅ Fonts */
+@import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Poppins:wght@400;500;600;700&display=swap');
+
+/* ✅ Laadt Tailwind v4 met één regel */
 @import "tailwindcss";
 
+
+/* ✅ Je eigen custom styles hieronder */
 body {
+  font-family: 'DM Sans', 'Poppins', sans-serif;
   overflow-x: hidden;
-  &::-webkit-scrollbar {
-    display: none;
-  }
 }
 
-/* Styling voor de native dropdown lijst */
-/* Algemene stijl voor dropdown-opties */
+body::-webkit-scrollbar {
+  display: none;
+}
+
+.no-scrollbar {
+  -ms-overflow-style: none; /* IE en Edge */
+  scrollbar-width: none;    /* Firefox */
+}
+.no-scrollbar::-webkit-scrollbar {
+  display: none;            /* Chrome, Safari */
+}
+
+/* Dropdown styling */
 select option {
-  background-color: #ffffff;        /* witte basisachtergrond */
-  color: #1f1f1f;                   /* iets zachter zwart voor prettige leesbaarheid */
+  background-color: #ffffff;
+  color: #1f1f1f;
   font-weight: 600;
-  padding: 8px 12px;                /* meer ruimte in de lijst */
-  border-radius: 6px;               /* ronde hoeken voor modernere look */
-  transition: all 0.25s ease;       /* zachte animatie bij hover */
+  padding: 8px 12px;
+  border-radius: 6px;
+  transition: all 0.25s ease;
 }
-
-/* Hover- en focus-effect */
 select option:hover,
 select option:focus {
-  background-color: #84B9FF;        /* jouw Unwrapza-blauw */
+  background-color: #84B9FF;
   color: #ffffff;
-  transform: scale(1.02);           /* mini-zoom bij hover voor tactiel gevoel */
-}
-
-/* Subtiele schaduw bij hover (AI-achtig effect) */
-select option:hover {
+  transform: scale(1.02);
   box-shadow: 0 2px 6px rgba(132, 185, 255, 0.4);
 }
-
-/* iOS / Safari fix: voorkomt rare grijze achtergrond bij selectie */
 select:focus > option:checked {
   background: #84B9FF !important;
   color: #ffffff !important;

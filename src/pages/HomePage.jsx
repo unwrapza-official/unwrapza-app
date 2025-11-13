@@ -1,13 +1,15 @@
 import React from 'react';
 import UnwrapzaAI from '../components/UnwrapzaAI/UnwrapzaAI';
-import HomePageProductsComponent from '../components/HomePageProductGrid';
+import AllProducts from '../components/products/AllProducts';
+import TrendingProducts from '../components/products/TrendingProducts'
 
 const HomePage = () => {
 
     return(
         <div>
             <UnwrapzaAI/>
-            <HomePageProductsComponent/>
+            <TrendingProducts/>
+            <AllProducts/>
         </div>
     )
 }

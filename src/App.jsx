@@ -6,11 +6,17 @@ import LoginPage from './pages/LoginPage'
 import Footer from './components/Footer'
 import NotFoundPage from './pages/NotFoundPage'
 import ScrollToTop from './functions/ScrollToTop'
+import AdminPage from "./pages/AdminPage"
 
 function App() {
   const location = useLocation();
 
-  const disableComponent = location.pathname === '/login'
+  const emptyPages = [
+    "/login",
+    "/admin",
+  ]
+
+  const disableComponent = emptyPages.includes(location.pathname);
   
   return (
     <>
@@ -19,6 +25,7 @@ function App() {
       <Routes>
         <Route path="/" element={<HomePage />} />
         <Route path="/login" element={<LoginPage />} />
+        <Route path="/admin" element={<AdminPage />}/>
         <Route path="/*" element={<NotFoundPage/>} />
       </Routes>
       {!disableComponent && <Footer/>}

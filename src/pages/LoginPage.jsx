@@ -3,16 +3,21 @@ import { auth, db, googleProvider } from "../firebase";
 import {
   createUserWithEmailAndPassword,
   signInWithEmailAndPassword,
+  sendPasswordResetEmail,
   signInWithPopup,
 } from "firebase/auth";
 import { doc, setDoc, getDoc } from "firebase/firestore";
+import { FcGoogle } from "react-icons/fc";
+import unwrapza from "../assets/unwrapza.png";
+import { Link } from "react-router-dom";
 
 const LoginPage = () => {
-  const [isRegister, setIsRegister] = useState(false);
+  const [mode, setMode] = useState("login"); // 'login' | 'register' | 'forgot'
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [username, setUsername] = useState("");
   const [error, setError] = useState("");
+  const [message, setMessage] = useState("");
   const [loading, setLoading] = useState(false);
 
   const saveUserToFirestore = async (user, extraData = {}) => {
@@ -32,15 +37,20 @@ const LoginPage = () => {
   const handleAuth = async (e) => {
     e.preventDefault();
     setError("");
+    setMessage("");
     setLoading(true);
     try {
-      let userCredential;
-      if (isRegister) {
-        userCredential = await createUserWithEmailAndPassword(auth, email, password);
-      } else {
-        userCredential = await signInWithEmailAndPassword(auth, email, password);
+      if (mode === "login") {
+        const userCredential = await signInWithEmailAndPassword(auth, email, password);
+        await saveUserToFirestore(userCredential.user);
+      } else if (mode === "register") {
+        const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+        await saveUserToFirestore(userCredential.user, { username });
+        setMessage("Account created successfully!");
+      } else if (mode === "forgot") {
+        await sendPasswordResetEmail(auth, email);
+        setMessage("Password reset email sent!");
       }
-      await saveUserToFirestore(userCredential.user);
     } catch (err) {
       setError(err.message);
     }
@@ -49,6 +59,7 @@ const LoginPage = () => {
 
   const handleGoogle = async () => {
     setError("");
+    setMessage("");
     setLoading(true);
     try {
       const result = await signInWithPopup(auth, googleProvider);
@@ -60,9 +71,9 @@ const LoginPage = () => {
   };
 
   return (
-    <div className="w-full min-h-screen flex flex-col bg-[#fefefe] relative">
-      {/* kleurstreep boven */}
-      <div className="w-full h-2.5 flex">
+    <div className="min-h-screen flex flex-col items-center justify-center bg-[#fefefe]">
+      {/* Kleurstreep bovenaan */}
+      <div className="w-full h-[6px] flex absolute top-0 left-0">
         {[
           "#FFFB84",
           "#84FF96",
@@ -77,102 +88,143 @@ const LoginPage = () => {
         ))}
       </div>
 
-      <div className="flex flex-col items-center justify-center flex-grow px-6 py-12">
-        <h1 className="text-5xl font-bold italic text-gray-900 mb-10 text-center">
-          {isRegister ? "Join Unwrapza" : "Welcome back"}
-        </h1>
+      {/* Titel */}
+      <Link to="/">
+        <img className="hover:cursor-pointer h-[40px] mb-[60px]" src={unwrapza} alt="unwrapza" />
+      </Link>
 
-        <form
-          onSubmit={handleAuth}
-          className="w-full max-w-[500px] flex flex-col gap-5 text-center"
-        >
-          {isRegister && (
+      {/* Container */}
+      <div className="bg-[#F8F8F8] shadow-md rounded-2xl p-5 w-full max-w-md border border-gray-100">
+        <form onSubmit={handleAuth} className="flex flex-col gap-5">
+          {/* Dynamisch formulier */}
+          {mode === "register" && (
+            <div>
+              <label className="block text-sm font-semibold mb-1">Username</label>
+              <input
+                type="text"
+                placeholder="Your username"
+                className="w-full p-2.5 border font-semibold border-[#50B68B] bg-white rounded-md outline-none"
+                value={username}
+                onChange={(e) => setUsername(e.target.value)}
+                required
+              />
+            </div>
+          )}
+
+          <div>
+            <label className="block text-sm font-semibold mb-1">E-Mail</label>
             <input
-              type="text"
-              placeholder="Username"
-              className="p-3 px-6 border-2 border-black bg-white text-black font-bold italic rounded-[6px]
-                         hover:translate-x-[6px] hover:translate-y-[6px]
-                         transition-all duration-300 ease-out active:scale-95 hover:cursor-text"
-              value={username}
-              onChange={(e) => setUsername(e.target.value)}
+              type="email"
+              placeholder="example@email.com"
+              className="w-full p-2.5 border font-semibold border-[#50B68B] bg-white rounded-md outline-none"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
               required
             />
+          </div>
+
+          {mode !== "forgot" && (
+            <div>
+              <label className="block text-sm font-semibold mb-1">Password</label>
+              <input
+                type="password"
+                placeholder="Your password"
+                className="w-full p-2.5 border font-semibold border-[#50B68B] bg-white rounded-md outline-none"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                required
+              />
+            </div>
           )}
-          <input
-            type="email"
-            placeholder="Email address"
-            className="p-3 px-6 border-2 border-black bg-white text-black font-bold italic rounded-[6px]
-                       hover:translate-x-[6px] hover:translate-y-[6px]
-                       transition-all duration-300 ease-out active:scale-95 hover:cursor-text"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            required
-          />
-          <input
-            type="password"
-            placeholder="Password"
-            className="p-3 px-6 border-2 border-black bg-white text-black font-bold italic rounded-[6px]
-                       hover:translate-x-[6px] hover:translate-y-[6px]
-                       transition-all duration-300 ease-out active:scale-95 hover:cursor-text"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            required
-          />
 
-          <button
-            type="submit"
-            disabled={loading}
-            className={`col-span-2 mt-4 p-3 px-6 bg-green border-3 text-black font-bold italic rounded-[6px]
-                       shadow-[3px_3px_0_#000000] hover:shadow-[0_0_0_#FFFFFF]
-                       hover:translate-x-[6px] hover:translate-y-[6px]
-                       transition-all duration-300 ease-out active:scale-95
-                       hover:cursor-pointer ${
-                         loading ? "opacity-60 cursor-not-allowed" : ""
-                       }`}
-          >
-            {loading
-              ? "Please wait..."
-              : isRegister
-              ? "Create account"
-              : "Continue login"}
-          </button>
+          <div className="flex items-center justify-between">
+            <button
+              type="submit"
+              disabled={loading}
+              className="bg-[#50B68B] hover:bg-green-700 text-white font-semibold py-2 px-10 rounded-md transition"
+            >
+              {loading
+                ? "Loading..."
+                : mode === "login"
+                ? "Login"
+                : mode === "register"
+                ? "Create account"
+                : "Send reset link"}
+            </button>
 
-          <button
-            onClick={handleGoogle}
-            type="button"
-            disabled={loading}
-            className={`col-span-2 mt-4 p-3 px-6 bg-white text-black border-3 border-gray-300 font-bold italic rounded-[6px]
-                       shadow-[3px_3px_0_#D1D5DB] hover:shadow-[0_0_0_#D1D5DB]
-                       hover:translate-x-[6px] hover:translate-y-[6px]
-                       transition-all duration-300 ease-out active:scale-95
-                       hover:cursor-pointer flex items-center justify-center gap-2 ${
-                         loading ? "opacity-60 cursor-not-allowed" : ""
-                       }`}
-          >
-            <img
-              src="https://www.svgrepo.com/show/475656/google-color.svg"
-              alt="Google"
-              className="w-5 h-5"
-            />
-            Continue with Google
-          </button>
+            {mode === "login" && (
+              <p
+                className="text-sm text-gray-500 cursor-pointer hover:underline"
+                onClick={() => setMode("forgot")}
+              >
+                Forgot password?
+              </p>
+            )}
+          </div>
+
+          {mode === "login" && (
+            <>
+              <div className="flex items-center gap-2 my-3">
+                <div className="flex-grow h-px bg-gray-200" />
+                <span className="text-xs text-gray-400">Or sign up with</span>
+                <div className="flex-grow h-px bg-gray-200" />
+              </div>
+
+              <div className="flex justify-center">
+                <button
+                  onClick={handleGoogle}
+                  type="button"
+                  className="bg-white hover:bg-gray-200 px-11 border-[#D9D9D9] border-1 py-3 rounded-md"
+                >
+                  <FcGoogle className="w-5 h-5" />
+                </button>
+              </div>
+            </>
+          )}
         </form>
 
-        {error && (
-          <p className="text-red-500 text-sm mt-6 font-semibold italic">
-            {error}
-          </p>
-        )}
+        {/* Fout- of succesmelding */}
+        {error && <p className="text-red-500 text-sm mt-4 text-center">{error}</p>}
+        {message && <p className="text-green-600 text-sm mt-4 text-center">{message}</p>}
 
-        <p className="mt-8 text-gray-800 text-sm italic">
-          {isRegister ? "Already have an account?" : "Don’t have an account?"}{" "}
-          <button
-            onClick={() => setIsRegister(!isRegister)}
-            className="text-green font-bold italic hover:underline"
-          >
-            {isRegister ? "Sign in" : "Sign up"}
-          </button>
-        </p>
+        {/* Footer */}
+        <div className="bg-gray-100 p-3 mt-6 rounded-b-2xl text-center">
+          {mode === "login" && (
+            <p className="text-sm text-gray-700">
+              No account yet?{" "}
+              <button
+                onClick={() => setMode("register")}
+                className="text-black font-semibold hover:underline"
+              >
+                Register
+              </button>
+            </p>
+          )}
+
+          {mode === "register" && (
+            <p className="text-sm text-gray-700">
+              Already have an account?{" "}
+              <button
+                onClick={() => setMode("login")}
+                className="text-black font-semibold hover:underline"
+              >
+                Login
+              </button>
+            </p>
+          )}
+
+          {mode === "forgot" && (
+            <p className="text-sm text-gray-700">
+              Back to{" "}
+              <button
+                onClick={() => setMode("login")}
+                className="text-black font-semibold hover:underline"
+              >
+                Login
+              </button>
+            </p>
+          )}
+        </div>
       </div>
     </div>
   );

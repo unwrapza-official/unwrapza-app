@@ -4,6 +4,16 @@ import { faBars, faTimes, faCircleUser, faCalendarDays, faMagnifyingGlass, faEye
 import CategoriesDropDown from './CategoriesDropDown'
 import { Link } from 'react-router-dom'
 import Sidebar from "./Sidebar";
+import unwrapza from "../assets/unwrapza.png"
+import for_her from "../assets/categories/for_her.png"
+import for_him from "../assets/categories/for_him.png"
+import tech_gifts from "../assets/categories/Tech_gifts.png"
+import home_living from "../assets/categories/Home_living.png"
+import funny_gifts from "../assets/categories/funny_gifts.png"
+import luxury_picks from "../assets/categories/Luxury_picks.png"
+import For_kids from "../assets/categories/For_kids.png"
+
+
 
 
 const Header = () => {
@@ -14,12 +24,13 @@ const Header = () => {
     const headerRef = useRef(null);
 
     const categories = [
-        "Tech Gifts",
-        "Fashion",
-        "Home & Living",
-        "Toys",
-        "Personalized",
-        "Eco-Friendly",
+        { name: "For Her", path: "/for-her", image: for_her },
+        { name: "For Him", path: "/for-him", image: for_him },
+        { name: "Tech Gifts", path: "/tech", image: tech_gifts },
+        { name: "Home & Living", path: "/home_living", image: home_living },
+        { name: "Funny Gifts", path: "/funny", image: funny_gifts },
+        { name: "Luxury Picks", path: "/luxury", image: luxury_picks },
+        { name: "For Kids", path: "/kids", image: For_kids },
     ];
 
     useEffect(() => {
@@ -59,11 +70,11 @@ const Header = () => {
             <div className="w-full flex flex-col items-center">
                 <div className="px-4 md:px-0 max-w-[1200px] w-full">
                     {/* Upper Main Header */}
-                    <div className="relative flex justify-center py-5">
+                    <div className="relative flex justify-center py-5 px-0">
                         <div className="w-full flex items-center px-2 md:px-0">
                             
                             {/* Hamburger + Logo (mobiel) */}
-                            <div className="flex w-1/3 justify-start items-center gap-2 md:hidden">
+                            <div className="flex w-auto md:w-1/3 justify-start items-center gap-2 md:hidden">
                             <button
                                 onClick={() => {
                                     if(isSideBarOpen){
@@ -87,9 +98,12 @@ const Header = () => {
                                 headerHeight={headerHeight}
                             />
 
-                            <h1 className="text-[#44A77D] font-bold text-3xl font-roboto hover:cursor-pointer">
-                                Unwrapza
-                            </h1>
+                
+                            <Link to="/">
+                                <img className='hover:cursor-pointer h-[25px] pt-[3px]'
+                                    src={unwrapza}
+                                />
+                            </Link>
                             </div>
 
                             {/* Slogan (desktop only) */}
@@ -101,9 +115,11 @@ const Header = () => {
 
                             {/* Logo (desktop only) */}
                             <div className="hidden md:flex w-1/3 justify-center items-center">
-                            <h1 className="hover:cursor-pointer text-[#44A77D] font-bold text-5xl font-roboto">   
-                                <Link to="/">Unwrapza</Link>
-                            </h1>
+                             <Link to="/">
+                                <img className='hover:cursor-pointer h-[40px]'
+                                    src={unwrapza}
+                                />
+                             </Link>
                             </div>
 
                             {/* Buttons (altijd tegen rechterkant) */}
@@ -167,7 +183,10 @@ const Header = () => {
                             <FontAwesomeIcon icon={faCaretDown} className="mt-[2px]" />
                         </p>
                         {categoriesMenuOpen && (
-                            <CategoriesDropDown headerHeight={headerHeight}/>
+                            <CategoriesDropDown
+                              headerHeight={headerHeight}
+                              categories={categories}
+                             />
                         )}
                     </div>
 

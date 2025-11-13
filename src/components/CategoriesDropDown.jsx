@@ -3,20 +3,8 @@ import { Link } from "react-router-dom";
 import { createPortal } from "react-dom";
 
 
-const CategoriesDropDown = ({ headerHeight }) => {
+const CategoriesDropDown = ({ headerHeight, categories = [] }) => {
   const [scrollY, setScrollY] = useState(window.scrollY);
-
-  const categories = [
-    { name: "For Her", path: "/for-her" },
-    { name: "For Him", path: "/for-him" },
-    { name: "Tech Gifts", path: "/tech" },
-    { name: "Home & Living", path: "/home" },
-    { name: "Funny Gifts", path: "/funny" },
-    { name: "Luxury Picks", path: "/luxury" },
-    { name: "Gadgets", path: "/gadgets" },
-    { name: "Personalized", path: "/personalized" },
-    { name: "Gift Cards", path: "/gift-cards" },
-  ];
 
   // ✅ Scroll body blokkeren wanneer dropdown open is
   useEffect(() => {
@@ -39,15 +27,32 @@ const CategoriesDropDown = ({ headerHeight }) => {
         height: "500px",
       }}
     >
-      {/* Hierbinnen mag je scrollen */}
-      <div className="max-w-[1200px] mx-auto w-full h-full px-6 py-4 grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-4 overflow-y-auto">
+   <div className="max-w-[1200px] mx-auto w-full h-full px-6 py-4 
+     grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-5 overflow-y-auto">
         {categories.map((cat, index) => (
           <Link
             key={index}
             to={cat.path}
-            className="px-4 py-2 hover:bg-[#f3f3f3] rounded-md transition"
+            className="
+              group flex flex-col items-center justify-center
+              bg-white rounded-xl p-4
+              shadow-[0_1px_3px_rgba(0,0,0,0.06)]
+              hover:shadow-[0_4px_12px_rgba(0,0,0,0.10)]
+              transition-all duration-300
+            "
           >
-            {cat.name}
+            {/* Image */}
+            <div className="w-25 h-25 rounded-xl overflow-hidden flex items-center justify-center bg-[#F4F5F4]">
+              <img
+                src={cat.image}
+                alt={cat.name}
+                className="w-full h-full object-cover group-hover:scale-110 transition-all duration-300"
+              />
+            </div>
+
+            <span className="mt-3 text-sm font-medium text-gray-800 text-center group-hover:text-black">
+              {cat.name}
+            </span>
           </Link>
         ))}
       </div>

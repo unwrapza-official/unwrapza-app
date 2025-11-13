@@ -1,6 +1,7 @@
 import { motion, AnimatePresence } from "framer-motion";
 import { useEffect, useState } from "react";
 import { X } from "lucide-react";
+import { Link } from "react-router-dom";
 
 const Sidebar = ({ isOpen, onClose, categories = [], headerHeight = 0 }) => {
   const [scrollY, setScrollY] = useState(0);
@@ -52,7 +53,7 @@ const Sidebar = ({ isOpen, onClose, categories = [], headerHeight = 0 }) => {
 
           {/* 🧭 Sidebar-panel */}
           <motion.aside
-            className="fixed left-0 w-full sm:w-2/3 bg-white z-50 shadow-2xl flex flex-col md:hidden"
+            className="fixed left-0 w-full bg-white z-50 shadow-2xl flex flex-col md:hidden"
             style={{
               top: `${headerHeight}px`,
               height: `calc(100vh - ${headerHeight}px)`,
@@ -80,18 +81,21 @@ const Sidebar = ({ isOpen, onClose, categories = [], headerHeight = 0 }) => {
               {categories.length > 0 ? (
                 <ul className="space-y-3">
                   {categories.map((cat, index) => (
-                    <li key={index}>
+                    <Link 
+                    key={index}
+                    to={cat.path}
+                    >
                       <button
                         className="w-full text-left text-lg text-gray-800 font-medium py-2 px-3 rounded-md hover:bg-gray-100 transition"
                         onClick={() => {
-                          console.log(`Clicked ${cat}`);
+                          console.log(`Clicked ${cat.name}`);
                           onClose();
                         }}
                       >
-                        {cat}
+                        {cat.name}
                         <div className="w-full h-[1px] bg-gray-200 mt-2"></div>
                       </button>
-                    </li>
+                    </Link>
                   ))}
                 </ul>
               ) : (
