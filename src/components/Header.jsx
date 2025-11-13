@@ -9,7 +9,7 @@ import for_her from "../assets/categories/For_her.png"
 import for_him from "../assets/categories/For_him.png"
 import tech_gifts from "../assets/categories/Tech_gifts.png"
 import home_living from "../assets/categories/Home_living.png"
-import funny_gifts from "../assets/categories/funny_gifts.png"
+import funny_gifts from "../assets/categories/Funny_gifts.png"
 import luxury_picks from "../assets/categories/Luxury_picks.png"
 import For_kids from "../assets/categories/For_kids.png"
 
