@@ -77,7 +77,7 @@ const Sidebar = ({ isOpen, onClose, categories = [], headerHeight = 0 }) => {
             </div>
 
             {/* Categorieën */}
-            <nav className="flex-1 overflow-y-auto px-5 py-4">
+            <nav className="flex-1 overflow-y-auto px-5 py-2 mb-5">
               {categories.length > 0 ? (
                 <ul className="space-y-3">
                   {categories.map((cat, index) => (
@@ -85,16 +85,26 @@ const Sidebar = ({ isOpen, onClose, categories = [], headerHeight = 0 }) => {
                     key={index}
                     to={cat.path}
                     >
-                      <button
-                        className="w-full text-left text-lg text-gray-800 font-medium py-2 px-3 rounded-md hover:bg-gray-100 transition"
-                        onClick={() => {
-                          console.log(`Clicked ${cat.name}`);
-                          onClose();
-                        }}
-                      >
-                        {cat.name}
-                        <div className="w-full h-[1px] bg-gray-200 mt-2"></div>
-                      </button>
+                      <div className="w-full flex items-center gap-3 py-2 px-2 rounded-md hover:bg-gray-100 transition">
+                        {/* Category icon */}
+                        <img
+                          className="w-10 h-10 object-contain rounded-md"
+                          src={cat.image}
+                          alt={cat.name}
+                        />
+
+                        {/* Text + underline */}
+                        <button
+                          className="flex flex-col w-full text-left text-[17px] text-gray-800 font-medium"
+                          onClick={() => {
+                            console.log(`Clicked ${cat.name}`);
+                            onClose();
+                          }}
+                        >
+                          <span>{cat.name}</span>
+                        </button>
+                      </div>
+                      <div className="w-full h-[1px] bg-gray-200 mt-2"></div>
                     </Link>
                   ))}
                 </ul>
