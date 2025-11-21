@@ -1,6 +1,7 @@
 import { useState } from 'react';
 
-const AISearchComponent = () => {
+const AISearchComponent = ({setResults}) => {
+  const [relative, setRelative] = useState('');
   const [age, setAge] = useState('');
   const [purpose, setPurpose] = useState('');
   const [type, setType] = useState('');
@@ -8,6 +9,7 @@ const AISearchComponent = () => {
   const [minPrice, setMinPrice] = useState('');
   const [maxPrice, setMaxPrice] = useState('');
 
+  const [loading, setLoading] = useState(false);
 
   const formatPrice = (value) => {
     if (!value) return "";
@@ -15,11 +17,65 @@ const AISearchComponent = () => {
     if (isNaN(num)) return "";
     return num.toFixed(2);
   };
+  
+
+  const handleClick = async (e) => {
+    e.preventDefault();
+
+    const errors = [];
+
+    if(!relative) errors.push("Please select who the gift is for.");
+    if(!age) errors.push("Please enter the age.");
+    if(!purpose) errors.push("Please enter the purpose of the gift.");
+    if(!type) errors.push("Please select the type of gift.");
+    if(!minPrice) errors.push("Please enter a minimum price.");
+    if(!maxPrice) errors.push("Please enter a maximum price.");
+
+    if(errors.length > 0){
+      alert(errors.join("\n"))
+      return
+    }
+
+    const formData = {
+      relative,
+      age: Number(age),
+      purpose,
+      type,
+      context,
+      minPrice: Number(minPrice),
+      maxPrice: Number(maxPrice),
+    };
+
+    console.log(formData);
+
+    try{
+      setLoading(true);
+
+      const response = await fetch(
+        "URL",
+        {
+          method: "POST",
+          headers: {"Content-Type": "application/json"},
+          body: JSON.stringify(formData),
+        }
+      );
+
+      if(!response.ok) throw new Error("Server error");
+      const data = await response.json();
+
+      setResults(data.productIds);
+
+    } catch(error){
+      console.log("Something went wrong: ", error);
+    } finally{
+      setLoading(false);
+    }
+  }
 
   return (
     <div className="w-full md:w-1/3 h-full flex flex-col items-center md:items-start">
       {/* Search container */}
-      <div className="w-9/10 h-full flex flex-col justify-evenly my-5">
+      <div className="w-9/10 h-full flex flex-col justify-evenly">
         <h1 className="italic font-roboto font-bold text-white text-[26px]">
           Let AI find 
           <span className="text-[#388dff]"> your </span> 
@@ -33,12 +89,14 @@ const AISearchComponent = () => {
           <label className="flex flex-col">
             For who is it?
             <select
+            value={relative}
+            onChange={(e) => setRelative(e.target.value)}
               className="mt-2 h-10 px-3 bg-green text-white font-semibold rounded-[6px] border-3
                          shadow-[4px_4px_0_#FFFFFF] hover:shadow-[0_0_0_#FFFFFF]
                          hover:translate-x-[4px] hover:translate-y-[4px]
                          transition-all duration-300 ease-out focus:outline-none cursor-pointer"
             >
-              <option value="" disabled selected>Select</option>
+              <option value="" disabled>Select</option>
               <option value="self" className='text-black'>Self</option>
               <option value="friend" className='text-black'>Friend</option>
               <option value="partner" className='text-black'>Partner</option>
@@ -52,6 +110,21 @@ const AISearchComponent = () => {
           <label className="flex flex-col">
             How old is he/she?
             <input
+              value={age}
+              onChange={(e) => {
+                
+                const val = e.target.value;
+                if (val.includes('-') || val.includes('e')) return;
+                setAge(val);
+              }}
+
+              onKeyDown={(e) => {
+                if(e.key === '-' || e.key === 'e'){
+                  e.preventDefault();
+                }
+              }}
+              min={0}
+              max={110}
               type="number"
               className="mt-2 h-10 px-3 bg-green text-white font-semibold rounded-[6px] border-3
                          shadow-[4px_4px_0_#FFFFFF] hover:shadow-[0_0_0_#FFFFFF]
@@ -66,6 +139,8 @@ const AISearchComponent = () => {
           <label className="flex flex-col">
             The purpose of this gift?
             <input
+            value={purpose}
+            onChange={(e) => setPurpose(e.target.value)}
               type="text"
               className="mt-2 h-10 px-3 bg-green text-white font-semibold rounded-[6px] border-3
                          shadow-[4px_4px_0_#FFFFFF] hover:shadow-[0_0_0_#FFFFFF]
@@ -79,12 +154,14 @@ const AISearchComponent = () => {
           <label className="flex flex-col">
             The type of this gift?
             <select
+            value={type}
+            onChange={(e) => setType(e.target.value)}
               className="mt-2 h-10 px-3 bg-green text-white font-semibold rounded-[6px] border-3
                          shadow-[4px_4px_0_#FFFFFF] hover:shadow-[0_0_0_#FFFFFF]
                          hover:translate-x-[4px] hover:translate-y-[4px]
                          transition-all duration-300 ease-out focus:outline-none cursor-pointer"
             >
-              <option value="" disabled selected>Select</option>
+              <option value="" disabled>Select</option>
               <option value="funny" className='text-black'>Funny</option>
               <option value="practical" className='text-black'>Practical</option>
               <option value="unique" className='text-black'>Unique</option>
@@ -97,6 +174,8 @@ const AISearchComponent = () => {
           <label className="flex flex-col col-span-2">
             More context about this gift?
             <textarea
+            value={context}
+            onChange={(e) => setContext(e.target.value)}
               className="mt-2 p-3 bg-green text-white font-semibold rounded-[6px] border-3
                          shadow-[4px_4px_0_#FFFFFF] hover:shadow-[0_0_0_#FFFFFF]
                          hover:translate-x-[4px] hover:translate-y-[4px]
@@ -140,7 +219,8 @@ const AISearchComponent = () => {
           {/* Submit Button */}
           <button
             type="submit"
-            className="col-span-2 mt-4 p-3 px-6 bg-green border-3
+            onClick={handleClick}
+            className="col-span-2 mt-4 py-2 px-6 bg-green border-3
                        text-white font-bold italic rounded-[6px]
                        shadow-[6px_6px_0_#FFFFFF] hover:shadow-[0_0_0_#FFFFFF]
                        hover:translate-x-[6px] hover:translate-y-[6px]

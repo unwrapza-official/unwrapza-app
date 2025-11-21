@@ -1,4 +1,3 @@
-import React from 'react';
 import UnwrapzaAI from '../components/UnwrapzaAI/UnwrapzaAI';
 import AllProducts from '../components/products/AllProducts';
 import TrendingProducts from '../components/products/TrendingProducts'

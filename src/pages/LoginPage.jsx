@@ -71,26 +71,10 @@ const LoginPage = () => {
   };
 
   return (
-    <div className="min-h-screen flex flex-col items-center justify-center bg-[#fefefe]">
-      {/* Kleurstreep bovenaan */}
-      <div className="w-full h-[6px] flex absolute top-0 left-0">
-        {[
-          "#FFFB84",
-          "#84FF96",
-          "#84F3FF",
-          "#84B9FF",
-          "#9084FF",
-          "#DC84FF",
-          "#FF84F7",
-          "#FF787A",
-        ].map((color, i) => (
-          <div key={i} className="flex-1" style={{ backgroundColor: color }}></div>
-        ))}
-      </div>
-
+    <div className="min-h-screen flex flex-col gap-10 items-center justify-center bg-[#fefefe]">
       {/* Titel */}
       <Link to="/">
-        <img className="hover:cursor-pointer h-[40px] mb-[60px]" src={unwrapza} alt="unwrapza" />
+        <img className="hover:cursor-pointer h-[40px]" src={unwrapza} alt="unwrapza" />
       </Link>
 
       {/* Container */}

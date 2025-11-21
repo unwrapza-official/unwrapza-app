@@ -16,14 +16,14 @@ const Footer = () => {
       </div>
 
       {/* 💬 Top Section */}
-      <div className="max-w-[1200px] mx-auto px-6 sm:px-8 md:px-10 py-12 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-10 border-b border-gray-100">
+      <div className="w-full max-w-[1200px] mx-auto px-4 py-12 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-10 border-b border-gray-100">
         {/* Help Section */}
         <div className="flex flex-col items-center sm:items-start text-center sm:text-left space-y-4">
           <h2 className="font-semibold text-[22px] text-gray-800">Need help?</h2>
           <p className="text-gray-500 text-sm max-w-[260px] sm:max-w-full">
             Our support team is happy to assist you with anything related to Unwrapza.
           </p>
-          <button className="border-2 border-[#44A77D] w-full sm:w-[200px] h-[48px] rounded-md font-semibold text-gray-800 hover:bg-[#44A77D] hover:text-white transition-all duration-300">
+          <button className="border-2 border-[#44A77D] px-10 h-[48px] rounded-md font-semibold text-gray-800 hover:bg-[#44A77D] hover:text-white transition-all duration-300">
             Contact us
           </button>
         </div>
@@ -33,18 +33,18 @@ const Footer = () => {
           <h2 className="font-semibold text-[22px] text-gray-800">Pages</h2>
           <ul className="space-y-2 text-gray-600">
             <li>
-              <a href="/" className="hover:text-[#44A77D] transition-colors">
-                About
+              <a href="/account" className="hover:text-[#44A77D] transition-colors">
+                Account
               </a>
             </li>
             <li>
-              <a href="/disclaimer" className="hover:text-[#44A77D] transition-colors">
-                Disclaimer
+              <a href="/account/calendar" className="hover:text-[#44A77D] transition-colors">
+                Calendar
               </a>
             </li>
             <li>
-              <a href="/privacy" className="hover:text-[#44A77D] transition-colors">
-                Privacy Policy
+              <a href="/account/wishlist" className="hover:text-[#44A77D] transition-colors">
+                Wishlist
               </a>
             </li>
           </ul>
@@ -61,9 +61,9 @@ const Footer = () => {
               type="email"
               placeholder="Your email"
               aria-label="Email address"
-              className="flex-1 h-[48px] border border-gray-300 rounded-md px-3 text-sm focus:outline-none focus:ring-2 focus:ring-[#44A77D] transition-all"
+              className="flex-1 py-2 border border-gray-300 rounded-md px-3 text-sm focus:outline-none focus:ring-2 focus:ring-[#44A77D] transition-all"
             />
-            <button className="bg-[#44A77D] text-white font-semibold px-5 h-[48px] rounded-md hover:bg-[#004a31] transition-all">
+            <button className="bg-[#44A77D] text-white font-semibold px-5 py-3 rounded-md hover:bg-[#004a31] transition-all">
               Sign up
             </button>
           </div>
@@ -72,7 +72,7 @@ const Footer = () => {
 
       {/* 🌿 Middle Footer */}
       <div className="bg-[#44A77D] text-white">
-        <div className="max-w-[1200px] mx-auto px-6 sm:px-8 md:px-10 py-10 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-10 text-center sm:text-left">
+        <div className="w-full max-w-[1200px] mx-auto px-4 py-10 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-10 text-center sm:text-left">
           {/* Company */}
           <div>
             <h3 className="uppercase text-xs tracking-widest text-white/80 font-semibold mb-3">
@@ -172,7 +172,7 @@ const Footer = () => {
 
       {/* ⚖️ Bottom */}
       <div className="bg-[#44A77D] border-t border-white/20">
-        <div className="max-w-[1200px] mx-auto text-center py-5 px-6">
+        <div className="max-w-[1200px] mx-auto text-center py-5 px-4">
           <p className="text-white font-semibold text-sm">
             © {currentYear} Unwrapza
           </p>

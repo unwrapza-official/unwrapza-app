@@ -5,6 +5,7 @@ import { useEffect, useState } from 'react';
 
 const UnwrapzaAI = () => {
 
+    const [results, setResults] = useState([]);
     const [lastClick, setLastClick] = useState(0);
     const [isVisible, setIsVisible] = useState(() => {
         const saved = localStorage.getItem("giftFinder_isVisible");
@@ -25,10 +26,10 @@ const UnwrapzaAI = () => {
 
     return (
         <>
-            <div className='w-full h-[45px] bg-[#44A77D] flex justify-center'>
-                <div className='w-full h-full max-w-[1200px] flex justify-end items-center px-4 md:px-0'>
+            <div className='w-full h-[40px] bg-[#44A77D] flex justify-center'>
+                <div className='w-full max-w-[1200px] px-4 flex justify-end items-center'>
                     <button 
-                       className='className="col-span-2 h-8 px-3 bg-green border-3
+                       className='className="col-span-2 h-[30px] px-3 bg-green border-3
                        text-white font-bold italic rounded-[6px]
                        shadow-[3px_3px_0_#FFFFFF] hover:shadow-[0_0_0_#FFFFFF]
                        hover:translate-x-[6px] hover:translate-y-[6px]
@@ -60,9 +61,9 @@ const UnwrapzaAI = () => {
                     transition={{ duration: 0.5 }}
                     className="w-full bg-[#60D8A5] flex justify-center"
                     >
-                    <div className="md:max-w-[1200px] w-full flex flex-col md:flex-row gap-6 py-6">
-                        <AISearchComponent />
-                        <AIResultComponent />
+                    <div className="max-w-[1200px] w-full px-4 flex flex-col md:flex-row gap-6 py-6">
+                        <AISearchComponent setResults={setResults} />
+                        <AIResultComponent results={results} />
                     </div>
                     </motion.div>
 

@@ -10,7 +10,7 @@ const AllProducts = () => {
   useEffect(() => {
     const fetchProducts = async () => {
       try {
-        const querySnapshot = await getDocs(collection(db, "Products"));
+        const querySnapshot = await getDocs(collection(db, "products"));
         const items = querySnapshot.docs.map((doc) => ({
           id: doc.id,
           ...doc.data(),
@@ -26,7 +26,7 @@ const AllProducts = () => {
   }, []);
 
   return (
-    <div className="px-4 md:px-0 md:max-w-[1200px] mx-auto">
+    <div className="w-full max-w-[1200px] mx-auto px-4">
       <div className="flex flex-col items-center">
         <h1 className="text-[#44A77D] py-[30px] font-semibold text-3xl md:text-5xl">
            All Products
@@ -54,9 +54,9 @@ const AllProducts = () => {
             </p>
           </div>
         ) : (
-          <div className="w-full mb-[100px] grid grid-cols-2 md:grid-cols-4 gap-10">
+          <div className="w-full mb-[100px] grid grid-cols-2 md:grid-cols-4 gap-12">
             {products.map((product) => (
-              <ProductCard key={product.id} product={product} />
+              <ProductCard key={product.id} product={product}  />
             ))}
           </div>
         )}

@@ -13,7 +13,7 @@ const TrendingProducts = () => {
   useEffect(() => {
     const fetchTrending = async () => {
       try {
-        const querySnapshot = await getDocs(collection(db, "Products"));
+        const querySnapshot = await getDocs(collection(db, "products"));
         const items = querySnapshot.docs.map((doc) => ({
           id: doc.id,
           ...doc.data(),
@@ -40,7 +40,7 @@ const TrendingProducts = () => {
   };
 
   return (
-    <div className="px-4 md:px-0 md:max-w-[1200px] mx-auto flex flex-col items-center">
+    <div className="w-full max-w-[1200px] mx-auto px-4 flex flex-col items-center">
       <h1 className="text-[#44A77D] py-[30px] text-3xl md:text-5xl font-semibold">
          Most Trending Gifts
       </h1>

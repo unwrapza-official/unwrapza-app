@@ -4,13 +4,13 @@ import { X } from "lucide-react";
 import { Link } from "react-router-dom";
 
 const Sidebar = ({ isOpen, onClose, categories = [], headerHeight = 0 }) => {
-  const [scrollY, setScrollY] = useState(0);
+  
 
   // 🧊 Lock scroll en bewaar positie
   useEffect(() => {
     if (isOpen) {
       const currentScrollY = window.scrollY;
-      setScrollY(currentScrollY);
+     
 
       // Body "bevriezen"
       document.body.style.position = "fixed";

@@ -2,7 +2,7 @@ import { useState, useRef, useEffect } from 'react'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faBars, faTimes, faCircleUser, faCalendarDays, faMagnifyingGlass, faEye, faCaretDown } from '@fortawesome/free-solid-svg-icons'
 import CategoriesDropDown from './CategoriesDropDown'
-import { Link } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 import Sidebar from "./Sidebar";
 import unwrapza from "../assets/unwrapza.png"
 import for_her from "../assets/categories/For_her.png"
@@ -13,15 +13,20 @@ import funny_gifts from "../assets/categories/Funny_gifts.png"
 import luxury_picks from "../assets/categories/Luxury_picks.png"
 import For_kids from "../assets/categories/For_kids.png"
 
-
-
-
 const Header = () => {
 
     const [categoriesMenuOpen, setCategoriesMenuOpen] = useState(false);
     const [isSideBarOpen, setIsSidebarOpen] = useState(false);
+    const [searchValue, setSearchValue] = useState("");
     const [headerHeight, setHeaderHeight] = useState(0);
     const headerRef = useRef(null);
+
+    const navigate = useNavigate();
+
+    const handleSearch = () => {
+        if(!searchValue.trim()) return;
+        navigate("/search?query=" + encodeURIComponent(searchValue));
+    }
 
     const categories = [
         { name: "For Her", path: "/for-her", image: for_her },
@@ -54,21 +59,8 @@ const Header = () => {
 
     return(
         <header ref={headerRef} className="w-full">
-            {/* Top Colors */}
-            <div className="w-full h-[5px] flex justify-evenly">
-                <div className="flex-1 h-full" style={{ backgroundColor: "#FFFB84" }}></div>
-                <div className="flex-1 h-full" style={{ backgroundColor: "#84FF96" }}></div>
-                <div className="flex-1 h-full" style={{ backgroundColor: "#84F3FF" }}></div>
-                <div className="flex-1 h-full" style={{ backgroundColor: "#84B9FF" }}></div>
-                <div className="flex-1 h-full" style={{ backgroundColor: "#9084FF" }}></div>
-                <div className="flex-1 h-full" style={{ backgroundColor: "#DC84FF" }}></div>
-                <div className="flex-1 h-full" style={{ backgroundColor: "#FF84F7" }}></div>
-                <div className="flex-1 h-full" style={{ backgroundColor: "#FF787A" }}></div>
-            </div>
-
             {/* Main Header */}
-            <div className="w-full flex flex-col items-center">
-                <div className="px-4 md:px-0 max-w-[1200px] w-full">
+                <div className="px-4 w-full max-w-[1200px] mx-auto">
                     {/* Upper Main Header */}
                     <div className="relative flex justify-center py-5 px-0">
                         <div className="w-full flex items-center px-2 md:px-0">
@@ -98,7 +90,6 @@ const Header = () => {
                                 headerHeight={headerHeight}
                             />
 
-                
                             <Link to="/">
                                 <img className='hover:cursor-pointer h-[25px] pt-[3px]'
                                     src={unwrapza}
@@ -123,7 +114,7 @@ const Header = () => {
                             </div>
 
                             {/* Buttons (altijd tegen rechterkant) */}
-                            <div className="absolute right-3 sm:right-0 top-1/2 -translate-y-1/2 flex gap-3 sm:gap-6 md:gap-8 items-end">
+                            <div className="absolute right-0 sm:right-0 top-1/2 -translate-y-1/2 flex gap-3 sm:gap-6 md:gap-8 items-end">
                             <Link to="/login" className="flex flex-col items-center">
                                 <FontAwesomeIcon
                                 icon={faCircleUser}
@@ -157,21 +148,23 @@ const Header = () => {
                             <input
                             type="text"
                             placeholder="Search for products, brands and more"
-                            className="w-full h-11 rounded-3xl border border-gray-300 pl-5 pr-12 focus:outline-none text-sm sm:text-base"
+                            className="w-full h-11 rounded-3xl border border-gray-300 pl-5 pr-12 focus:outline-black-300 text-sm sm:text-base"
+                            onChange={(e) => setSearchValue(e.target.value)}
+                            onKeyDown={(e) => {
+                                if(e.key === "Enter") handleSearch();
+                            }}
                             />
                             <FontAwesomeIcon
                             icon={faMagnifyingGlass}
                             className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-500 cursor-pointer"
+                            onClick={handleSearch}
                             />
                         </div>
                     </div>
                 </div>
-            </div>
 
             {/* Lower Header */}
-            <div className="hidden w-full h-[60px] md:flex justify-center">
-                <div className="max-w-[1200px] w-full flex justify-between items-center font-roboto">
-                    
+                <div className="hidden w-full max-w-[1200px] h-[40px] px-4 mx-auto md:flex justify-between items-center font-roboto"> 
                     {/* Left side: Categories */}
                     <div 
                         className="relative group cursor-pointer h-full flex justify-center"
@@ -196,7 +189,6 @@ const Header = () => {
                         <Link to="/occasions" className="hover:text-gray-700 transition hover:underline">Occasions</Link>
                     </div>
                 </div>
-            </div>
             <div className='w-full h-[1px] bg-gray-300'></div>
         </header>
     )
