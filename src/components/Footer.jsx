@@ -56,7 +56,7 @@ const Footer = () => {
           <p className="text-gray-500 text-sm max-w-[300px]">
             Get updates on new features, AI deals, and personalized gift ideas.
           </p>
-          <div className="flex flex-col sm:flex-row gap-3 w-full sm:w-auto">
+          <div className="flex flex-col sm:flex-row gap-3 sm:w-auto">
             <input
               type="email"
               placeholder="Your email"

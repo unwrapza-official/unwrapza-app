@@ -1,6 +1,7 @@
 import { useState, useRef, useEffect } from 'react'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faBars, faTimes, faCircleUser, faCalendarDays, faMagnifyingGlass, faEye, faCaretDown } from '@fortawesome/free-solid-svg-icons'
+import { auth } from "../firebase";
 import CategoriesDropDown from './CategoriesDropDown'
 import { Link, useNavigate } from 'react-router-dom'
 import Sidebar from "./Sidebar";
@@ -115,7 +116,9 @@ const Header = () => {
 
                             {/* Buttons (altijd tegen rechterkant) */}
                             <div className="absolute right-0 sm:right-0 top-1/2 -translate-y-1/2 flex gap-3 sm:gap-6 md:gap-8 items-end">
-                            <Link to="/login" className="flex flex-col items-center">
+                            
+                            <Link to={auth.currentUser ? "/account" : "/login"}
+                            className="flex flex-col items-center">
                                 <FontAwesomeIcon
                                 icon={faCircleUser}
                                 className="text-[#44A77D] text-2xl sm:text-3xl md:text-4xl hover:scale-110 transition-transform duration-200"
@@ -123,7 +126,7 @@ const Header = () => {
                                 <p className="underline text-[#44A77D] text-xs sm:text-sm md:text-base">Account</p>
                             </Link>
 
-                            <Link to="" className="hidden sm:flex flex-col items-center">
+                            <Link to={auth.currentUser ? "/account/calendar" : "/login"} className="hidden sm:flex flex-col items-center">
                                 <FontAwesomeIcon
                                 icon={faCalendarDays}
                                 className="text-[#84B9FF] text-2xl sm:text-3xl md:text-4xl hover:scale-110 transition-transform duration-200"
@@ -131,7 +134,7 @@ const Header = () => {
                                 <p className="underline text-[#84B9FF] text-xs sm:text-sm md:text-base">Calendar</p>
                             </Link>
 
-                            <Link to="" className="hidden sm:flex flex-col items-center">
+                            <Link to={auth.currentUser ? "/account/wishlist" : "/login"} className="hidden sm:flex flex-col items-center">
                                 <FontAwesomeIcon
                                 icon={faEye}
                                 className="text-[#DC84FF] text-2xl sm:text-3xl md:text-4xl hover:scale-110 transition-transform duration-200"

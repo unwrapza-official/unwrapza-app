@@ -26,8 +26,7 @@ const AllProducts = () => {
   }, []);
 
   return (
-    <div className="w-full max-w-[1200px] mx-auto px-4">
-      <div className="flex flex-col items-center">
+    <div className="w-full max-w-[1200px] mx-auto px-4 flex flex-col items-center">
         <h1 className="text-[#44A77D] py-[30px] font-semibold text-3xl md:text-5xl">
            All Products
         </h1>
@@ -60,7 +59,6 @@ const AllProducts = () => {
             ))}
           </div>
         )}
-      </div>
     </div>
   );
 };

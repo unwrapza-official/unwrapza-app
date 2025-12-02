@@ -5,9 +5,12 @@ import Header from './components/Header'
 import LoginPage from './pages/LoginPage'
 import Footer from './components/Footer'
 import NotFoundPage from './pages/NotFoundPage'
-import ScrollToTop from './functions/ScrollToTop'
-import AdminPage from "./pages/AdminPage"
-import SearchResults from "./pages/SearchResults"
+import ScrollToTop from './utils/ScrollToTop'
+import AdminPage from "./pages/account/AdminPage"
+import AccountCalendarPage from "./pages/account/AccountCalendarPage"
+import AccountWishlistPage from "./pages/account/AccountWishlistPage"
+import SearchResults from "./pages/SearchResults" 
+import Account from "./pages/account/AccountHomePage"
 import UpperColors from './components/UpperColors'
 import ProductDetails from './components/products/ProductDetails'
 
@@ -27,12 +30,15 @@ function App() {
       {!disableComponent && <Header />}
       <ScrollToTop/>
       <Routes>
-        <Route path="/" element={<HomePage />} />
-        <Route path="/login" element={<LoginPage />} />
+        <Route path="/" element={<HomePage />}/>
+        <Route path="/account" element={<Account/>}/>
+        <Route path="/account/calendar" element={<AccountCalendarPage/>}/>
+        <Route path="/account/wishlist" element={<AccountWishlistPage/>}/>
+        <Route path="/login" element={<LoginPage />}/>
         <Route path="/admin" element={<AdminPage />}/>
         <Route path ="/product/:id" element={<ProductDetails/>}/>
-        <Route path="/search" element={<SearchResults />} />
-        <Route path="/*" element={<NotFoundPage/>} />
+        <Route path="/search" element={<SearchResults />}/>
+        <Route path="/*" element={<NotFoundPage/>}/>
       </Routes>
       {!disableComponent && <Footer/>}
     </>

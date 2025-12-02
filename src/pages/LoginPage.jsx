@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { auth, db, googleProvider } from "../firebase";
 import {
   createUserWithEmailAndPassword,
@@ -19,6 +20,8 @@ const LoginPage = () => {
   const [error, setError] = useState("");
   const [message, setMessage] = useState("");
   const [loading, setLoading] = useState(false);
+
+  const navigate = useNavigate();
 
   const saveUserToFirestore = async (user, extraData = {}) => {
     const userRef = doc(db, "users", user.uid);
@@ -43,10 +46,12 @@ const LoginPage = () => {
       if (mode === "login") {
         const userCredential = await signInWithEmailAndPassword(auth, email, password);
         await saveUserToFirestore(userCredential.user);
+        navigate("/account")
       } else if (mode === "register") {
         const userCredential = await createUserWithEmailAndPassword(auth, email, password);
         await saveUserToFirestore(userCredential.user, { username });
         setMessage("Account created successfully!");
+        navigate("/account")
       } else if (mode === "forgot") {
         await sendPasswordResetEmail(auth, email);
         setMessage("Password reset email sent!");
@@ -64,6 +69,7 @@ const LoginPage = () => {
     try {
       const result = await signInWithPopup(auth, googleProvider);
       await saveUserToFirestore(result.user);
+      navigate("/account")
     } catch (err) {
       setError(err.message);
     }

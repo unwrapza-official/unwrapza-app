@@ -1,6 +1,6 @@
 import { useState } from 'react';
 
-const AISearchComponent = ({setResults}) => {
+const AISearchComponent = ({setResults, setIsSearching}) => {
   const [relative, setRelative] = useState('');
   const [age, setAge] = useState('');
   const [purpose, setPurpose] = useState('');
@@ -18,9 +18,10 @@ const AISearchComponent = ({setResults}) => {
     return num.toFixed(2);
   };
   
-
   const handleClick = async (e) => {
     e.preventDefault();
+
+    setIsSearching(true);
 
     const errors = [];
 
@@ -52,7 +53,7 @@ const AISearchComponent = ({setResults}) => {
       setLoading(true);
 
       const response = await fetch(
-        "URL",
+        "https://us-central1-unwrapza.cloudfunctions.net/giftFinder",
         {
           method: "POST",
           headers: {"Content-Type": "application/json"},
@@ -69,6 +70,7 @@ const AISearchComponent = ({setResults}) => {
       console.log("Something went wrong: ", error);
     } finally{
       setLoading(false);
+      setIsSearching(false)
     }
   }
 

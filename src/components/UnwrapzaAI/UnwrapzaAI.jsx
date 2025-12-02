@@ -7,6 +7,8 @@ const UnwrapzaAI = () => {
 
     const [results, setResults] = useState([]);
     const [lastClick, setLastClick] = useState(0);
+    const [isSearching, setIsSearching] = useState(false);
+
     const [isVisible, setIsVisible] = useState(() => {
         const saved = localStorage.getItem("giftFinder_isVisible");
         return saved !== null ? saved === "true" : true; 
@@ -15,7 +17,6 @@ const UnwrapzaAI = () => {
     useEffect(() => {
         localStorage.setItem("giftFinder_isVisible", isVisible);
     }, [isVisible]);
-
 
     const handleClick = () =>{
         const now = Date.now();
@@ -62,8 +63,8 @@ const UnwrapzaAI = () => {
                     className="w-full bg-[#60D8A5] flex justify-center"
                     >
                     <div className="max-w-[1200px] w-full px-4 flex flex-col md:flex-row gap-6 py-6">
-                        <AISearchComponent setResults={setResults} />
-                        <AIResultComponent results={results} />
+                        <AISearchComponent setResults={setResults} setIsSearching={setIsSearching} />
+                        <AIResultComponent results={results} isSearching={isSearching}/>
                     </div>
                     </motion.div>
 
