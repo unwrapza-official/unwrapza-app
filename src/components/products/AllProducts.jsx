@@ -27,7 +27,7 @@ const AllProducts = () => {
 
   return (
     <div className="w-full max-w-[1200px] mx-auto px-4 flex flex-col items-center">
-        <h1 className="text-[#44A77D] py-[30px] font-semibold text-3xl md:text-5xl">
+        <h1 className="text-[#44A77D] py-[30px] font-semibold text-3xl md:text-4xl">
            All Products
         </h1>
 
@@ -53,7 +53,7 @@ const AllProducts = () => {
             </p>
           </div>
         ) : (
-          <div className="w-full mb-[100px] grid grid-cols-2 md:grid-cols-4 gap-12">
+          <div className="w-full mb-[100px] grid grid-cols-2 md:grid-cols-4 xl:grid-cols-5 gap-12">
             {products.map((product) => (
               <ProductCard key={product.id} product={product}  />
             ))}

@@ -100,7 +100,7 @@ const Header = () => {
 
                             {/* Slogan (desktop only) */}
                             <div className="hidden md:flex w-1/3 justify-start items-center">
-                            <p className="font-roboto italic font-semibold text-[#44A77D] text-lg tracking-wide leading-snug hover:text-[#84B9FF] transition-colors duration-300 w-[300px]">
+                            <p className="font-roboto italic font-semibold text-[#44A77D] text-lg tracking-wide leading-snug hover:text-[#84B9FF] transition-colors duration-300 w-full max-w-[250px]">
                                 Because the best gifts are found, not searched
                             </p>
                             </div>
@@ -121,7 +121,7 @@ const Header = () => {
                             className="flex flex-col items-center">
                                 <FontAwesomeIcon
                                 icon={faCircleUser}
-                                className="text-[#44A77D] text-2xl sm:text-3xl md:text-4xl hover:scale-110 transition-transform duration-200"
+                                className="text-[#44A77D] text-2xl sm:text-3xl md:text-3xl hover:scale-110 transition-transform duration-200"
                                 />
                                 <p className="underline text-[#44A77D] text-xs sm:text-sm md:text-base">Account</p>
                             </Link>
@@ -129,7 +129,7 @@ const Header = () => {
                             <Link to={auth.currentUser ? "/account/calendar" : "/login"} className="hidden sm:flex flex-col items-center">
                                 <FontAwesomeIcon
                                 icon={faCalendarDays}
-                                className="text-[#84B9FF] text-2xl sm:text-3xl md:text-4xl hover:scale-110 transition-transform duration-200"
+                                className="text-[#84B9FF] text-2xl sm:text-3xl md:text-3xl hover:scale-110 transition-transform duration-200"
                                 />
                                 <p className="underline text-[#84B9FF] text-xs sm:text-sm md:text-base">Calendar</p>
                             </Link>
@@ -137,7 +137,7 @@ const Header = () => {
                             <Link to={auth.currentUser ? "/account/wishlist" : "/login"} className="hidden sm:flex flex-col items-center">
                                 <FontAwesomeIcon
                                 icon={faEye}
-                                className="text-[#DC84FF] text-2xl sm:text-3xl md:text-4xl hover:scale-110 transition-transform duration-200"
+                                className="text-[#DC84FF] text-2xl sm:text-3xl md:text-3xl hover:scale-110 transition-transform duration-200"
                                 />
                                 <p className="underline text-[#DC84FF] text-xs sm:text-sm md:text-base">Wishlist</p>
                             </Link>

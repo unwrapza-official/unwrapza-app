@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import { collection, getDocs } from "firebase/firestore";
+import { collection, getDocs, query, where } from "firebase/firestore";
 import { db } from "../../firebase";
 import ProductCard from "./ProductCard";
 import { ChevronLeft, ChevronRight } from "lucide-react";
@@ -9,24 +9,33 @@ const TrendingProducts = () => {
   const [loading, setLoading] = useState(true);
   const scrollContainer = useRef(null);
 
-  // 🔥 Haal alle producten op (of pas later filter aan)
   useEffect(() => {
-    const fetchTrending = async () => {
-      try {
-        const querySnapshot = await getDocs(collection(db, "products"));
-        const items = querySnapshot.docs.map((doc) => ({
-          id: doc.id,
-          ...doc.data(),
-        }));
-        setProducts(items);
-      } catch (error) {
-        console.error("Error fetching trending products:", error);
-      } finally {
-        setLoading(false);
-      }
-    };
-    fetchTrending();
-  }, []);
+  const fetchTrending = async () => {
+    try {
+      // 🔥 Firestore query: haal alleen featured producten op
+      const q = query(
+        collection(db, "products"),
+        where("isFeatured", "==", true)
+      );
+
+      const querySnapshot = await getDocs(q);
+
+      const items = querySnapshot.docs.map(doc => ({
+        id: doc.id,
+        ...doc.data(),
+      }));
+
+      setProducts(items);
+
+    } catch (error) {
+      console.error("Error fetching trending products:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  fetchTrending();
+}, []);
 
   const scroll = (direction) => {
     if (scrollContainer.current) {

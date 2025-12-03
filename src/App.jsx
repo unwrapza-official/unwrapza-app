@@ -13,6 +13,11 @@ import SearchResults from "./pages/SearchResults"
 import Account from "./pages/account/AccountHomePage"
 import UpperColors from './components/UpperColors'
 import ProductDetails from './components/products/ProductDetails'
+import Disclaimer from './pages/legal/Disclaimer'
+import TermsConditions from './pages/legal/TermsConditions'
+import PrivacyPolicy from './pages/legal/PrivacyPolicy'
+import CookiePolicy from './pages/legal/CookiePolicy'
+import About from './pages/About'
 
 function App() {
   const location = useLocation();
@@ -32,6 +37,11 @@ function App() {
       <Routes>
         <Route path="/" element={<HomePage />}/>
         <Route path="/account" element={<Account/>}/>
+        <Route path="/about" element={<About/>}/>
+        <Route path="/cookiepolicy" element={<CookiePolicy/>}/>
+        <Route path="/privacy" element={<PrivacyPolicy/>}/>
+        <Route path="/disclaimer" element={<Disclaimer/>}/>
+        <Route path="/terms" element={<TermsConditions/>}/>
         <Route path="/account/calendar" element={<AccountCalendarPage/>}/>
         <Route path="/account/wishlist" element={<AccountWishlistPage/>}/>
         <Route path="/login" element={<LoginPage />}/>

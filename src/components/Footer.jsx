@@ -118,6 +118,11 @@ const Footer = () => {
                   Disclaimer
                 </a>
               </li>
+              <li>
+                <a href="/cookiepolicy" className="hover:opacity-80 transition-opacity">
+                  Cookie policy
+                </a>
+              </li>
             </ul>
           </div>
 

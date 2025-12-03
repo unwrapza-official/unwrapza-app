@@ -10,6 +10,7 @@ const ProductDetails = () =>{
     const { id } = useParams();
     const [product, setProduct] = useState(null);
     const [similarProducts, setSimilarPoducts] = useState(null);
+    const [expanded, setExpanded] = useState(false);
     const [loading, setLoading] = useState(true);
 
     useEffect(()  => {
@@ -62,7 +63,7 @@ const ProductDetails = () =>{
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.4 }}
-            className="relative w-full flex items-center justify-center bg-[#E8F0EA] rounded-xl p-6"
+            className="relative w-full flex h-[320px] sm:h-[360px] md:h-[380px] lg:h-[420px] xl:h-[450px] items-center justify-center bg-[#F5FAF7] rounded-xl p-6"
         >
             {/* WISHLIST BUTTON */}
             <button
@@ -76,7 +77,7 @@ const ProductDetails = () =>{
             <img
             src={product.image}
             alt={product.name}
-            className="w-full max-h-[400px] object-contain"
+            className="w-full h-full  object-contain"
             />
         </motion.div>
 
@@ -105,9 +106,36 @@ const ProductDetails = () =>{
             Buy this product →
             </button>
 
-            <p className="text-gray-700 leading-relaxed">
-            {product.description || "Dit product heeft nog geen beschrijving."}
-            </p>
+            {/* DESCRIPTION WITH READ MORE */}
+                <div className="relative mt-4">
+
+                    <motion.div
+                        animate={{ height: expanded ? "auto" : 110 }} // ≈ 5 regels
+                        transition={{ duration: 0.35, ease: "easeInOut" }}
+                        className="relative overflow-hidden"
+                    >
+                        <p className="text-gray-700 leading-relaxed max-w-prose break-words">
+                            {product.description || "Dit product heeft nog geen beschrijving."}
+                        </p>
+
+                        {/* Fade overlay when collapsed */}
+                        {!expanded && (
+                            <div className="absolute bottom-0 left-0 w-full h-16 
+                                            bg-gradient-to-t from-white to-transparent 
+                                            pointer-events-none"></div>
+                        )}
+                    </motion.div>
+
+                    {/* READ MORE BUTTON */}
+                    {product.description && product.description.length > 150 && (
+                        <button
+                            className="text-[#44A77D] font-semibold mt-3"
+                            onClick={() => setExpanded(!expanded)}
+                        >
+                            {expanded ? "Show less ▲" : "Read more ▼"}
+                        </button>
+                    )}
+                </div>
         </motion.div>
         </div>
 
