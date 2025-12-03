@@ -31,7 +31,7 @@ const Footer = () => {
         {/* Pages Section */}
         <div className="flex flex-col items-center text-center sm:text-left space-y-4">
           <h2 className="font-semibold text-[22px] text-gray-800">Pages</h2>
-          <ul className="space-y-2 text-gray-600">
+          <ul className="space-y-2 text-gray-600 flex flex-col items-center">
             <li>
               <a href="/account" className="hover:text-[#44A77D] transition-colors">
                 Account

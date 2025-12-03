@@ -115,7 +115,7 @@ const Header = () => {
                             </div>
 
                             {/* Buttons (altijd tegen rechterkant) */}
-                            <div className="absolute right-0 sm:right-0 top-1/2 -translate-y-1/2 flex gap-3 sm:gap-6 md:gap-8 items-end">
+                            <div className="absolute right-0 sm:right-0 top-1/2 -translate-y-1/2 flex gap-3 sm:gap-6 md:gap-5 items-end">
                             
                             <Link to={auth.currentUser ? "/account" : "/login"}
                             className="flex flex-col items-center">
@@ -151,7 +151,7 @@ const Header = () => {
                             <input
                             type="text"
                             placeholder="Search for products, brands and more"
-                            className="w-full h-11 rounded-3xl border border-gray-300 pl-5 pr-12 focus:outline-black-300 text-sm sm:text-base"
+                            className="w-full h-11 rounded-3xl border border-gray-300 pl-5 pr-12 focus:outline-orange-300 text-sm sm:text-base"
                             onChange={(e) => setSearchValue(e.target.value)}
                             onKeyDown={(e) => {
                                 if(e.key === "Enter") handleSearch();

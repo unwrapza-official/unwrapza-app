@@ -7,10 +7,12 @@ import Footer from './components/Footer'
 import NotFoundPage from './pages/NotFoundPage'
 import ScrollToTop from './utils/ScrollToTop'
 import AdminPage from "./pages/account/AdminPage"
-import AccountCalendarPage from "./pages/account/AccountCalendarPage"
-import AccountWishlistPage from "./pages/account/AccountWishlistPage"
 import SearchResults from "./pages/SearchResults" 
-import Account from "./pages/account/AccountHomePage"
+import AccountLayout from "./pages/account/AccountLayout"
+import CalendarPage from "./pages/account/AccountCalendarPage"
+import MyPeoplePage from "./pages/account/AccountPeoplePage"
+import ProfilePage from "./pages/account/AccountProfilePage"
+import WishlistPage from './pages/account/AccountWishlistPage'
 import UpperColors from './components/UpperColors'
 import ProductDetails from './components/products/ProductDetails'
 import Disclaimer from './pages/legal/Disclaimer'
@@ -36,14 +38,17 @@ function App() {
       <ScrollToTop/>
       <Routes>
         <Route path="/" element={<HomePage />}/>
-        <Route path="/account" element={<Account/>}/>
         <Route path="/about" element={<About/>}/>
         <Route path="/cookiepolicy" element={<CookiePolicy/>}/>
         <Route path="/privacy" element={<PrivacyPolicy/>}/>
         <Route path="/disclaimer" element={<Disclaimer/>}/>
         <Route path="/terms" element={<TermsConditions/>}/>
-        <Route path="/account/calendar" element={<AccountCalendarPage/>}/>
-        <Route path="/account/wishlist" element={<AccountWishlistPage/>}/>
+        <Route path="/account" element={<AccountLayout/>}>
+          <Route index element={<ProfilePage />} />
+          <Route path="calendar" element={<CalendarPage />} />
+          <Route path="people" element={<MyPeoplePage />} />
+          <Route path="wishlist" element={<WishlistPage />} />
+        </Route>
         <Route path="/login" element={<LoginPage />}/>
         <Route path="/admin" element={<AdminPage />}/>
         <Route path ="/product/:id" element={<ProductDetails/>}/>

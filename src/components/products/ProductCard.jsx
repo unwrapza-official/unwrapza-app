@@ -42,7 +42,7 @@ const ProductCard = ({ product }) => {
 
       <div className="relative w-full flex flex-col text-start mt-4">
         <p className="text-sm text-gray-400">{product.platform}</p>
-        <h3 className="mt-1 font-bold text-gray-800 text-base leading-snug font-poppins whitespace-nowrap overflow-hidden">
+        <h3 className="mt-1 font-bold text-sm text-gray-800 text-base leading-snug font-poppins whitespace-nowrap overflow-hidden">
           {product.name}
         </h3>
         <h2 className="mt-2 font-bold text-[#44A77D] text-lg font-dmsans">
