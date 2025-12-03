@@ -1,4 +1,4 @@
-import AccountSidebar from "../../components/account/AccountSidebar"
+import AccountSidebar from "../../components/account/AccountSidebarTEMP"
 import { Outlet } from "react-router-dom"
 
 const AccountLayout = () => {
