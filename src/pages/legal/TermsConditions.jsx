@@ -3,7 +3,7 @@ const TermsConditions = () => {
     <div className="w-full max-w-[1200px] mx-auto px-4 py-12 text-gray-800">
       <h1 className="text-3xl font-bold mb-6">Terms & Conditions</h1>
 
-      <p className="mb-4">Last updated: <em>[fill in date]</em></p>
+      <p className="mb-4">Last updated: <em>[3-12-2025]</em></p>
 
       <p className="mb-6">
         Welcome to Unwrapza. By accessing or using our website, you agree to the following Terms & Conditions. 

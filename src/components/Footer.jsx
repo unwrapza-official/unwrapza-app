@@ -29,7 +29,7 @@ const Footer = () => {
         </div>
 
         {/* Pages Section */}
-        <div className="flex flex-col items-center sm:items-start text-center sm:text-left space-y-4">
+        <div className="flex flex-col items-center text-center sm:text-left space-y-4">
           <h2 className="font-semibold text-[22px] text-gray-800">Pages</h2>
           <ul className="space-y-2 text-gray-600">
             <li>
@@ -51,7 +51,7 @@ const Footer = () => {
         </div>
 
         {/* Newsletter */}
-        <div className="flex flex-col items-center sm:items-start text-center sm:text-left space-y-4">
+        <div className="flex flex-col items-center sm:items-start lg:items-end text-center sm:text-left lg:text-right space-y-4">
           <h2 className="font-semibold text-[22px] text-gray-800">Sign up for emails</h2>
           <p className="text-gray-500 text-sm max-w-[300px]">
             Get updates on new features, AI deals, and personalized gift ideas.
@@ -98,11 +98,11 @@ const Footer = () => {
           </div>
 
           {/* Legal */}
-          <div>
+          <div className="flex flex-col items-center">
             <h3 className="uppercase text-xs tracking-widest text-white/80 font-semibold mb-3">
               Legal
             </h3>
-            <ul className="space-y-2 text-sm">
+            <ul className="space-y-2 text-sm flex justify-center flex-col items-center">
               <li>
                 <a href="/privacy" className="hover:opacity-80 transition-opacity">
                   Privacy Policy
@@ -127,11 +127,11 @@ const Footer = () => {
           </div>
 
           {/* Connect */}
-          <div>
+          <div className="flex justify-center sm:justify-start lg:justify-end">
+            <ul className="space-y-2 text-sm lg:text-end">
             <h3 className="uppercase text-xs tracking-widest text-white/80 font-semibold mb-3">
               Connect
             </h3>
-            <ul className="space-y-2 text-sm">
               <li>
                 <a
                   href="https://instagram.com/unwrapza"
