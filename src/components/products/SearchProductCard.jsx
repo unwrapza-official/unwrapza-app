@@ -1,10 +1,49 @@
 import { addDoc, collection, doc, updateDoc, increment } from "firebase/firestore";
 import { db } from "../../firebase";
 import { useNavigate } from "react-router-dom";
+import { useEffect, useState } from "react";
+import { auth } from "../../firebase";
+import { setDoc, deleteDoc, getDocs } from "firebase/firestore";
 import { Heart } from "lucide-react";
 
 const SearchProductCard = ({ product }) => {
-  const navigate = useNavigate();
+  const [wishlistIds, setWishlistIds] = useState([]);
+
+  const navigate = useNavigate(); 
+
+  const toggleWishlist = async (productId) => {
+    const user = auth.currentUser;
+    if (!user) return alert("Log in om producten als favoriet op te slaan!");
+
+    const itemRef = doc(db, "users", user.uid, "wishlist", productId);
+
+    const exists = wishlistIds.includes(productId);
+
+    if (exists) {
+      await deleteDoc(itemRef);
+      setWishlistIds(prev => prev.filter(id => id !== productId)); // UI direct updaten
+    } else {
+      await setDoc(itemRef, {
+        addedAt: new Date()
+      });
+      setWishlistIds(prev => [...prev, productId]); // UI direct updaten
+    }
+  };
+
+  useEffect(() => {
+    const loadWishlist = async () => {
+      const user = auth.currentUser;
+      if (!user) return;
+
+      const ref = collection(db, "users", user.uid, "wishlist");
+      const snap = await getDocs(ref);
+
+      const ids = snap.docs.map(d => d.id);
+      setWishlistIds(ids);
+    };
+
+    loadWishlist();
+  }, []);
 
   const handleClick = async () => {
     try {
@@ -122,9 +161,13 @@ const SearchProductCard = ({ product }) => {
                 p-1.5 sm:p-2 rounded-full border border-gray-300 
                 hover:bg-gray-100 transition shadow-sm
               "
-              onClick={(e) => e.stopPropagation()}
+              onClick={(e) => {
+                e.stopPropagation()
+                toggleWishlist(product.id)
+               }
+              }
             >
-              <Heart className="text-gray-600 w-4 h-4 sm:w-5 sm:h-5" />
+              <Heart className={`w-4 h-4 sm:w-5 sm:h-5 ${wishlistIds.includes(product.id) ? "text-red-500 fill-red-500" : "text-gray-500"}`} />
             </button>
 
             {/* VIEW BUTTON */}

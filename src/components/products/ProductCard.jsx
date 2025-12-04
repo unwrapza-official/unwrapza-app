@@ -1,12 +1,49 @@
 import { addDoc, collection, increment, updateDoc, doc } from "firebase/firestore";
+import { useEffect, useState } from "react";
+import { auth } from "../../firebase";
+import { setDoc, deleteDoc, getDocs } from "firebase/firestore";
 import { db } from "../../firebase";
 import { Heart } from "lucide-react"; 
 import { useNavigate } from "react-router-dom";
 
-
 const ProductCard = ({ product }) => {
 
   const navigate = useNavigate();
+  const [wishlistIds, setWishlistIds] = useState([]);
+
+  const toggleWishlist = async (productId) => {
+    const user = auth.currentUser;
+    if (!user) return alert("Log in om producten als favoriet op te slaan!");
+
+    const itemRef = doc(db, "users", user.uid, "wishlist", productId);
+
+    const exists = wishlistIds.includes(productId);
+
+    if (exists) {
+      await deleteDoc(itemRef);
+      setWishlistIds(prev => prev.filter(id => id !== productId)); // UI direct updaten
+    } else {
+      await setDoc(itemRef, {
+        addedAt: new Date()
+      });
+      setWishlistIds(prev => [...prev, productId]); // UI direct updaten
+    }
+  };
+
+  useEffect(() => {
+    const loadWishlist = async () => {
+      const user = auth.currentUser;
+      if (!user) return;
+
+      const ref = collection(db, "users", user.uid, "wishlist");
+      const snap = await getDocs(ref);
+
+      const ids = snap.docs.map(d => d.id);
+      setWishlistIds(ids);
+    };
+
+    loadWishlist();
+  }, []);
 
   const handleClick = async () => {
     try {
@@ -49,12 +86,20 @@ const ProductCard = ({ product }) => {
           {product.price}
         </h2>
         <button 
-        className="absolute right-0 top-4/5 -translate-y-2/5 z-10 bg-white/80 backdrop-blur-sm rounded-full p-2 hover:bg-white transition hover:cursor-pointer"
-        onClick={(e) => e.stopPropagation()}  
+          className="absolute right-0 top-4/5 -translate-y-1/2 z-10 
+                    bg-white/80 backdrop-blur-sm rounded-full p-2 
+                    hover:bg-white transition"
+          onClick={(e) => {
+            e.stopPropagation();
+            toggleWishlist(product.id);
+          }}  
         >
-            <Heart className="text-gray-600 hover:text-red-500 transition"
-          
-            />
+          <Heart 
+            className={`w-5 h-5 transition-all 
+              ${wishlistIds.includes(product.id) 
+                ? "text-red-500 fill-red-500" 
+                : "text-gray-600 hover:text-red-500"}`}
+          />
         </button>
       </div>
     </div>
