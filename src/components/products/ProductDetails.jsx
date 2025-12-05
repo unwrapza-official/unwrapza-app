@@ -1,8 +1,10 @@
 import { useParams } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
-import { doc, getDoc } from "firebase/firestore";
+import { auth } from "../../firebase";
 import { db } from "../../firebase";
+import { setDoc, deleteDoc, getDocs, doc } from "firebase/firestore";
+import { collection, getDoc } from "firebase/firestore";
 import { Heart } from "lucide-react";
 
 
@@ -12,6 +14,41 @@ const ProductDetails = () =>{
     const [similarProducts, setSimilarPoducts] = useState(null);
     const [expanded, setExpanded] = useState(false);
     const [loading, setLoading] = useState(true);
+    const [wishlistIds, setWishlistIds] = useState([]);
+
+    const toggleWishlist = async (productId) => {
+    const user = auth.currentUser;
+    if (!user) return alert("Log in om producten als favoriet op te slaan!");
+
+    const itemRef = doc(db, "users", user.uid, "wishlist", productId);
+
+    const exists = wishlistIds.includes(productId);
+
+    if (exists) {
+      await deleteDoc(itemRef);
+      setWishlistIds(prev => prev.filter(id => id !== productId)); // UI direct updaten
+    } else {
+      await setDoc(itemRef, {
+        addedAt: new Date()
+      });
+      setWishlistIds(prev => [...prev, productId]); // UI direct updaten
+    }
+    };
+
+    useEffect(() => {
+        const loadWishlist = async () => {
+        const user = auth.currentUser;
+        if (!user) return;
+
+        const ref = collection(db, "users", user.uid, "wishlist");
+        const snap = await getDocs(ref);
+
+        const ids = snap.docs.map(d => d.id);
+        setWishlistIds(ids);
+        };
+
+        loadWishlist();
+    }, []);
 
     useEffect(()  => {
         const fetchProduct = async () => {
@@ -20,9 +57,8 @@ const ProductDetails = () =>{
             const snap = await getDoc(docRef);
 
             if(snap.exists()){
-                setProduct(snap.data());
+                setProduct({ id: snap.id, ...snap.data() });
             }
-
             setLoading(false);
             }
             catch(error){
@@ -67,10 +103,13 @@ const ProductDetails = () =>{
         >
             {/* WISHLIST BUTTON */}
             <button
-            onClick={() => console.log("Add to wishlist:", product.id)}
+            onClick={(e) => {
+                e.stopPropagation();
+                toggleWishlist(product.id)
+            }}
             className="absolute top-4 right-4 bg-white/90 hover:bg-white shadow-md rounded-full p-2 transition"
             >
-            <Heart className="w-6 h-6 text-gray-700 hover:text-red-500 transition" />
+            <Heart className={`w-6 h-6 transition ${wishlistIds.includes(product.id) ? "text-red-500 fill-red-500" : "text-gray-700 hover:text-red-500"}`} />
             </button>
 
             {/* IMAGE */}

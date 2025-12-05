@@ -1,7 +1,22 @@
 import { Link } from "react-router-dom";
 import { User, Calendar, Users, Heart, LogOut } from "lucide-react";
+import { signOut } from "firebase/auth";
+import { auth } from "../../firebase";
+import { useNavigate } from "react-router-dom";
 
 const AccountSidebar = () => {
+    const navigate = useNavigate()
+
+    const handleLogout = async () => {
+        try{
+            await signOut(auth);
+            navigate('/');
+        }
+        catch(err){
+            console.log("Logout error: " + err);
+        }
+    }
+
     return (
         <nav className="w-56 bg-white border-r border-gray-200 p-4">
             <ul className="divide-y divide-gray-200">
@@ -47,7 +62,10 @@ const AccountSidebar = () => {
                 </li>
 
                 <li>
-                    <button className="w-full flex items-center gap-3 p-3 hover:bg-gray-100 rounded-md text-red-500 hover:text-red-600 transition hover:cursor-pointer">
+                    <button 
+                    className="w-full flex items-center gap-3 p-3 hover:bg-gray-100 rounded-md text-red-500 hover:text-red-600 transition hover:cursor-pointer"
+                    onClick={handleLogout}
+                    >
                         <LogOut size={18} />
                         <span>Logout</span>
                     </button>
