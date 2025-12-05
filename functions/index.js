@@ -18,6 +18,16 @@ const client = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
 });
 
+// ----- Helper: API spam prevention ----
+
+function getClientId(req) {
+  const uid = req.headers["x-user-id"];
+  if (uid) return `user_${uid}`;
+
+  const ip = req.headers["x-forwarded-for"] || req.ip || "unknown";
+  return `ip_${ip.replace(/[^a-zA-Z0-9]/g, "_")}`;
+}
+
 // ----- Helper: embedding -----
 async function embedText(text) {
   const response = await client.embeddings.create({
@@ -88,6 +98,47 @@ exports.generateProductEmbeddings = onRequest((req, res) => {
 exports.giftFinder = onRequest((req, res) => {
   cors(req, res, async () => {
     try {
+      const clientId = getClientId(req);
+      const usageRef = db.collection("usage").doc(clientId);
+
+      const now = Date.now();
+      const oneHourAgo = now - 60 * 60 * 1000;
+      const oneDayAgo = now - 24 * 60 * 60 * 1000;
+
+      const usageSnap = await usageRef.get();
+      let usage = usageSnap.exists? usageSnap.data().requests || [] : [];
+
+      const lastHour = usage.filter(t => t > oneHourAgo);
+      const lastDay = usage.filter(t => t > oneDayAgo);
+      const lastRequest = usage.length > 0 ? usage[usage.length - 1] : null;
+
+      const cooldown = 10 * 1000;
+      const hourlyLimit = 20;
+      const dailyLimit = 50;
+
+      if(lastRequest && now - lastRequest < cooldown){
+        return res.status(429).json({
+          error: "too fast! Wait a couple seconds" 
+        })
+      }
+
+      if(lastHour.length >= hourlyLimit){
+         return res.status(429).json({
+          error: "Too many requests. Wait for an hour before trying again."
+        });
+      }
+
+       // Daily limit
+      if (lastDay.length >= dailyLimit) {
+        return res.status(429).json({
+          error: "Daily limit reached."
+        });
+      }
+
+      usage = lastDay;
+      usage.push(now);
+      await usageRef.set({requests: usage});
+
       const {
         relative,
         age,

@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { db } from "../../firebase";
-import { addDoc, collection, serverTimestamp } from "firebase/firestore";
+import { addDoc, collection, serverTimestamp, getDoc } from "firebase/firestore";
+import { auth } from "../../firebase";
 
 const AdminPage = () => {
   const [formData, setFormData] = useState({
@@ -59,6 +60,20 @@ const AdminPage = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+
+    const user = auth.currentUser;
+    if(!user){
+      alert("You must be logged in as an admin!");
+      return;
+    }
+    
+    const ref = doc(db, "users", user.uid);
+    const snap = await getDoc(ref);
+    if(!snap.exists() || snap.data().role !== "admin"){
+      alert("Unauthorized access!");
+      return;
+    }
+
     setLoading(true);
     setSuccess(false);
 

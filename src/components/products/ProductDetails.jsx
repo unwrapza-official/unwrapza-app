@@ -57,9 +57,8 @@ const ProductDetails = () =>{
             const snap = await getDoc(docRef);
 
             if(snap.exists()){
-                setProduct(snap.data());
+                setProduct({ id: snap.id, ...snap.data() });
             }
-
             setLoading(false);
             }
             catch(error){

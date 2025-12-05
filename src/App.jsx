@@ -6,6 +6,7 @@ import LoginPage from './pages/LoginPage'
 import Footer from './components/Footer'
 import NotFoundPage from './pages/NotFoundPage'
 import ScrollToTop from './utils/ScrollToTop'
+import AdminRoute from './components/auth/AdminRoute'
 import AdminPage from "./pages/account/AdminPage"
 import SearchResults from "./pages/SearchResults" 
 import AccountLayout from "./pages/account/AccountLayout"
@@ -50,7 +51,7 @@ function App() {
           <Route path="wishlist" element={<WishlistPage />} />
         </Route>
         <Route path="/login" element={<LoginPage />}/>
-        <Route path="/admin" element={<AdminPage />}/>
+        <Route path="/admin" element={<AdminRoute><AdminPage /></AdminRoute>}/>
         <Route path ="/product/:id" element={<ProductDetails/>}/>
         <Route path="/search" element={<SearchResults />}/>
         <Route path="/*" element={<NotFoundPage/>}/>

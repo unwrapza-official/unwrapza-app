@@ -8,7 +8,7 @@ const AISearchComponent = ({setResults, setIsSearching}) => {
   const [context, setContext] = useState('');
   const [minPrice, setMinPrice] = useState('');
   const [maxPrice, setMaxPrice] = useState('');
-
+  const [errorMessage, setErrorMessage] = useState("");
   const [loading, setLoading] = useState(false);
 
   const formatPrice = (value) => {
@@ -20,7 +20,6 @@ const AISearchComponent = ({setResults, setIsSearching}) => {
   
   const handleClick = async (e) => {
     e.preventDefault();
-
     setIsSearching(true);
 
     const errors = [];
@@ -61,13 +60,23 @@ const AISearchComponent = ({setResults, setIsSearching}) => {
         }
       );
 
-      if(!response.ok) throw new Error("Server error");
-      const data = await response.json();
+      if(!response.ok){
+        let errorMessage = "Something went wrong";
 
+        try{
+          const errData = await response.json();
+          if(errData.error) errorMessage = errData.error;
+        }
+        catch(_){}
+        throw new Error(errorMessage)
+      }
+
+      const data = await response.json();
       setResults(data.productIds);
 
     } catch(error){
       console.log("Something went wrong: ", error);
+      setErrorMessage(error.message);
     } finally{
       setLoading(false);
       setIsSearching(false)
@@ -232,6 +241,11 @@ const AISearchComponent = ({setResults, setIsSearching}) => {
             Let AI do its thing
           </button>
         </form>
+        {errorMessage && (
+          <div className="bg-red-200 border border-red-400 text-red-800 w-full p-3 rounded-lg mt-3 text-sm animate-fadeIn">
+            ⚠️ {errorMessage}
+          </div>
+        )}
       </div>
     </div>
   );
