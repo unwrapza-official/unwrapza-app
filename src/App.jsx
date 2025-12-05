@@ -21,6 +21,7 @@ import TermsConditions from './pages/legal/TermsConditions'
 import PrivacyPolicy from './pages/legal/PrivacyPolicy'
 import CookiePolicy from './pages/legal/CookiePolicy'
 import About from './pages/About'
+import {Toaster} from 'react-hot-toast';
 
 function App() {
   const location = useLocation();
@@ -37,6 +38,43 @@ function App() {
       <UpperColors/>
       {!disableComponent && <Header />}
       <ScrollToTop/>
+      <Toaster 
+        position="top-right"
+        toastOptions={{
+          // DEFAULT TOAST STYLE
+          style: {
+            background: "#ffffff",
+            color: "#333",
+            borderRadius: "12px",
+            padding: "12px 16px",
+            border: "1px solid #e5e7eb",
+            fontSize: "14px",
+            fontWeight: 500,
+          },
+          
+          // SUCCESS TOAST STYLE
+          success: {
+            iconTheme: {
+              primary: "#44A77D",
+              secondary: "#ffffff",
+            },
+            style: {
+              border: "1px solid #44A77D",
+            },
+          },
+
+          // ERROR TOAST STYLE
+          error: {
+            iconTheme: {
+              primary: "#e11d48",
+              secondary: "#ffffff",
+            },
+            style: {
+              border: "1px solid #e11d48",
+            },
+          },
+        }}
+      />
       <Routes>
         <Route path="/" element={<HomePage />}/>
         <Route path="/about" element={<About/>}/>

@@ -6,7 +6,7 @@ import { db } from "../../firebase";
 import { setDoc, deleteDoc, getDocs, doc } from "firebase/firestore";
 import { collection, getDoc } from "firebase/firestore";
 import { Heart } from "lucide-react";
-
+import toast from "react-hot-toast";
 
 const ProductDetails = () =>{
     const { id } = useParams();
@@ -18,7 +18,7 @@ const ProductDetails = () =>{
 
     const toggleWishlist = async (productId) => {
     const user = auth.currentUser;
-    if (!user) return alert("Log in to save products to your favorites!");
+    if (!user) return toast.error("Log in to save products to your favorites!");
 
     const itemRef = doc(db, "users", user.uid, "wishlist", productId);
 

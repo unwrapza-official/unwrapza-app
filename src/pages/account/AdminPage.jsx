@@ -2,6 +2,7 @@ import { useState } from "react";
 import { db } from "../../firebase";
 import { addDoc, collection, serverTimestamp, getDoc } from "firebase/firestore";
 import { auth } from "../../firebase";
+import toast from "react-hot-toast";
 
 const AdminPage = () => {
   const [formData, setFormData] = useState({
@@ -63,14 +64,14 @@ const AdminPage = () => {
 
     const user = auth.currentUser;
     if(!user){
-      alert("You must be logged in as an admin!");
+      toast.error("You must be logged in as an admin!");
       return;
     }
     
     const ref = doc(db, "users", user.uid);
     const snap = await getDoc(ref);
     if(!snap.exists() || snap.data().role !== "admin"){
-      alert("Unauthorized access!");
+      toast.error("Unauthorized access!");
       return;
     }
 
@@ -79,7 +80,7 @@ const AdminPage = () => {
 
     const errorMessage = validate();
     if (errorMessage) {
-      alert(errorMessage);
+      toast.error(errorMessage);
       setLoading(false);
       return;
     }
@@ -127,7 +128,7 @@ const AdminPage = () => {
       });
     } catch (error) {
       console.error("Error adding product:", error);
-      alert("Er ging iets mis bij het toevoegen.");
+      toast.error("Er ging iets mis bij het toevoegen.");
     } finally {
       setLoading(false);
     }

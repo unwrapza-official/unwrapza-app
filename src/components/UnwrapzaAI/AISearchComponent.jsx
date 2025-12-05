@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import toast from 'react-hot-toast';
 
 const AISearchComponent = ({setResults, setIsSearching}) => {
   const [relative, setRelative] = useState('');
@@ -20,7 +21,6 @@ const AISearchComponent = ({setResults, setIsSearching}) => {
   
   const handleClick = async (e) => {
     e.preventDefault();
-    setIsSearching(true);
 
     const errors = [];
 
@@ -32,9 +32,11 @@ const AISearchComponent = ({setResults, setIsSearching}) => {
     if(!maxPrice) errors.push("Please enter a maximum price.");
 
     if(errors.length > 0){
-      alert(errors.join("\n"))
+      toast.error(errors.join("\n"))
       return
     }
+    
+    setIsSearching(true);
 
     const formData = {
       relative,
