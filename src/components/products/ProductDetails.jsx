@@ -18,7 +18,7 @@ const ProductDetails = () =>{
 
     const toggleWishlist = async (productId) => {
     const user = auth.currentUser;
-    if (!user) return alert("Log in om producten als favoriet op te slaan!");
+    if (!user) return alert("Log in to save products to your favorites!");
 
     const itemRef = doc(db, "users", user.uid, "wishlist", productId);
 
