@@ -7,6 +7,7 @@ import { setDoc, deleteDoc, getDocs, doc } from "firebase/firestore";
 import { collection, getDoc } from "firebase/firestore";
 import { Heart } from "lucide-react";
 import toast from "react-hot-toast";
+import { useUserCountry } from "../../hooks/useUserCountry";
 
 const ProductDetails = () =>{
     const { id } = useParams();
@@ -15,6 +16,16 @@ const ProductDetails = () =>{
     const [expanded, setExpanded] = useState(false);
     const [loading, setLoading] = useState(true);
     const [wishlistIds, setWishlistIds] = useState([]);
+
+    const {marketplace, currency, loadingCountry} = useUserCountry();
+    
+    const getCurrencySymbol = (currency) => {
+        switch(currency){
+        case "EUR": return "€";
+        case "GBP": return "£";
+        default: return "€";
+        }
+    }
 
     const toggleWishlist = async (productId) => {
     const user = auth.currentUser;
@@ -87,6 +98,9 @@ const ProductDetails = () =>{
         </div>
         );
     }
+    const displayPrice = product.prices?.[marketplace] ?? product.prices?.de ?? null;
+    
+    const priceSymbol = getCurrencySymbol(currency);
 
     return (
     <div className="w-full max-w-[1200px] mx-auto px-4 py-10">
@@ -131,7 +145,7 @@ const ProductDetails = () =>{
             </h1>
 
             <p className="text-xl font-semibold text-[#44A77D] mb-2">
-            €{product.price}
+               {loadingCountry ? "loading...." : displayPrice ? `${priceSymbol}${displayPrice?.toFixed(2)}`: "Price unavailable"}
             </p>
 
             <p className="text-sm text-gray-500 mb-6">
@@ -154,7 +168,7 @@ const ProductDetails = () =>{
                         className="relative overflow-hidden"
                     >
                         <p className="text-gray-700 leading-relaxed max-w-prose break-words">
-                            {product.description || "Dit product heeft nog geen beschrijving."}
+                            {product.description || "This product has no description."}
                         </p>
 
                         {/* Fade overlay when collapsed */}

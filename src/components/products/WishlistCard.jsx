@@ -3,9 +3,24 @@ import { useNavigate } from "react-router-dom";
 import { auth, db } from "../../firebase"
 import { deleteDoc, doc } from "firebase/firestore";
 import toast from "react-hot-toast";
+import { useUserCountry } from "../../hooks/useUserCountry";
 
 const WishlistCard = ({product}) => {
     const navigate = useNavigate();
+
+    const {marketplace, currency, loadingCountry} = useUserCountry();
+    
+    const getCurrencySymbol = (currency) => {
+       switch(currency){
+        case "EUR": return "€";
+        case "GBP": return "£";
+        default: return "€";
+      }
+    }
+    
+    const displayPrice = product.prices?.[marketplace] ?? product.prices?.de ?? null;
+    
+    const priceSymbol = getCurrencySymbol(currency);
 
     const removeFromWishlist = async () => {
         const user = auth.currentUser;
@@ -42,7 +57,7 @@ const WishlistCard = ({product}) => {
         </h3>
 
         <p className="text-[#44A77D] font-bold mt-1 text-base">
-        {product.price}
+        {loadingCountry ? "loading...." : displayPrice !== null ? `${priceSymbol}${displayPrice?.toFixed(2)}` : "Price unavailable"}
         </p>
 
         {/* CTA button */}

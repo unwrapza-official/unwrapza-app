@@ -11,7 +11,6 @@ import { doc, setDoc, getDoc } from "firebase/firestore";
 import { FcGoogle } from "react-icons/fc";
 import unwrapza from "../assets/unwrapza.png";
 import { Link } from "react-router-dom";
-import toast from "react-hot-toast";
 
 const LoginPage = () => {
   const [mode, setMode] = useState("login"); // 'login' | 'register' | 'forgot'
@@ -51,8 +50,8 @@ const LoginPage = () => {
       } else if (mode === "register") {
         const userCredential = await createUserWithEmailAndPassword(auth, email, password);
         await saveUserToFirestore(userCredential.user, { username });
-        toast.success("Your account has been created 🎉");
-        navigate("/account");
+        setMessage("Account created successfully!");
+        navigate("/account")
       } else if (mode === "forgot") {
         await sendPasswordResetEmail(auth, email);
         setMessage("Password reset email sent!");
@@ -70,8 +69,7 @@ const LoginPage = () => {
     try {
       const result = await signInWithPopup(auth, googleProvider);
       await saveUserToFirestore(result.user);
-      toast.success("Welcome to your account dashboard!")
-      navigate("/account");
+      navigate("/account")
     } catch (err) {
       setError(err.message);
     }

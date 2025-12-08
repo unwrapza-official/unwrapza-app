@@ -4,19 +4,19 @@ const { setGlobalOptions } = require("firebase-functions");
 const { onRequest } = require("firebase-functions/https");
 const logger = require("firebase-functions/logger");
 const cors = require("cors")({ origin: true });
+const { Resend } = require("resend");
 
 const admin = require("firebase-admin");
 const OpenAI = require("openai");
 
 admin.initializeApp();
 const db = admin.firestore();
+const resend = new Resend(process.env.RESEND_API_KEY);
 
 setGlobalOptions({ maxInstances: 10 });
 
 // OpenAI client
-const client = new OpenAI({
-  apiKey: process.env.OPENAI_API_KEY,
-});
+const client = new OpenAI({ apiKey: process.env.OPENAI_API_KEY,});
 
 // ----- Helper: API spam prevention ----
 
@@ -55,6 +55,117 @@ function cosineSimilarity(a, b) {
 
   return dot / (Math.sqrt(normA) * Math.sqrt(normB));
 }
+
+// =======================================================
+//  🚀 ADDITION: SEND VERIFICATION CODE
+// =======================================================
+
+exports.sendVerificationCode = onRequest((req, res) => {
+  cors(req, res, async () => {
+    try {
+      const { email } = req.body;
+
+      if (!email) {
+        return res.status(400).json({ error: "Email is required" });
+      }
+
+      // Generate 6 digit code
+      const code = Math.floor(100000 + Math.random() * 900000).toString();
+
+      // Save code in Firestore
+      try {
+        await db.collection("emailVerification").add({
+          email,
+          code,
+          expiresAt: Date.now() + 10 * 60 * 1000,
+          used: false,
+          createdAt: admin.firestore.FieldValue.serverTimestamp(),
+        });
+        console.log("Write success");
+      } catch (err) {
+        console.error("Firestore WRITE ERROR:", err);
+      }
+
+      // Send code via email
+      await resend.emails.send({
+        from: "Unwrapza <onboarding@resend.dev>",
+        to: email,
+        subject: "Your Unwrapza verification code",
+        html: `
+          <p>Your verification code:</p>
+          <h1 style="font-size: 32px; letter-spacing:3px;">${code}</h1>
+          <p>This code expires in 10 minutes.</p>
+        `,
+      });
+
+      return res.status(200).json({ success: true });
+
+    } catch (err) {
+      console.error("Error sending code:", err);
+      return res.status(500).json({ error: "Server error" });
+    }
+  });
+});
+
+// =======================================================
+//  🚀 ADDITION: VERIFY CODE + CREATE ACCOUNT
+// =======================================================
+
+exports.verifyCode = onRequest((req, res) => {
+  cors(req, res, async () => {
+    try {
+      const { email, password, username, code } = req.body;
+
+      if (!email || !password || !username || !code) {
+        return res.status(400).json({ error: "Missing fields" });
+      }
+
+      // Lookup verification code
+      const snap = await db.collection("emailVerification")
+        .where("email", "==", email)
+        .where("code", "==", code)
+        .where("used", "==", false)
+        .get();
+
+      if (snap.empty) {
+        return res.status(400).json({ error: "Invalid or expired verification code" });
+      }
+
+      const docRef = snap.docs[0].ref;
+      const data = snap.docs[0].data();
+
+      // Expired?
+      if (Date.now() > data.expiresAt) {
+        return res.status(400).json({ error: "Verification code expired" });
+      }
+
+      // Mark code as used
+      await docRef.update({ used: true });
+
+      // Create Firebase Auth user
+      const userRecord = await admin.auth().createUser({
+        email,
+        password,
+        displayName: username,
+      });
+
+      // Save user info
+      await db.collection("users").doc(userRecord.uid).set({
+        uid: userRecord.uid,
+        email,
+        username,
+        createdAt: admin.firestore.FieldValue.serverTimestamp(),
+        verified: true,
+      });
+
+      return res.status(200).json({ success: true });
+
+    } catch (err) {
+      console.error("Error verifying code:", err);
+      return res.status(500).json({ error: "Server error" });
+    }
+  });
+});
 
 // ---------- 1. Product embeddings genereren ----------
 exports.generateProductEmbeddings = onRequest((req, res) => {
@@ -147,15 +258,18 @@ exports.giftFinder = onRequest((req, res) => {
         context,
         minPrice,
         maxPrice,
+        marketplace
       } = req.body || {};
 
       let query = db.collection("products");
 
-      if (typeof minPrice === "number")
-        query = query.where("price", ">=", minPrice);
+      const priceField = `prices.${marketplace}`;
 
-      if (typeof maxPrice === "number")
-        query = query.where("price", "<=", maxPrice);
+      if (typeof minPrice === "number" && !isNaN(minPrice))
+        query = query.where(priceField, ">=", minPrice);
+
+      if (typeof maxPrice === "number" && !isNaN(minPrice))
+        query = query.where(priceField, "<=", maxPrice);
 
       const snap = await query.get();
       if (snap.empty) return res.status(200).json({ productIds: [] });

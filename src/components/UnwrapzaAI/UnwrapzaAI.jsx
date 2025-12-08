@@ -8,6 +8,7 @@ const UnwrapzaAI = () => {
     const [results, setResults] = useState([]);
     const [lastClick, setLastClick] = useState(0);
     const [isSearching, setIsSearching] = useState(false);
+    const [showResults, setShowResults] = useState(false);
 
     const [isVisible, setIsVisible] = useState(() => {
         const saved = localStorage.getItem("giftFinder_isVisible");
@@ -63,9 +64,27 @@ const UnwrapzaAI = () => {
                     className="w-full bg-[#60D8A5] flex justify-center"
                     >
                     <div className="max-w-[1200px] w-full px-4 flex flex-col md:flex-row gap-6 py-6">
-                        <AISearchComponent setResults={setResults} setIsSearching={setIsSearching} />
-                        <AIResultComponent results={results} isSearching={isSearching}/>
+
+                        {/* SEARCH COMPONENT */}
+                        <div className={`${showResults ? "hidden md:block" : "block"} w-full md:w-1/3`}>
+                            <AISearchComponent 
+                                setResults={setResults} 
+                                setIsSearching={setIsSearching}
+                                setShowResults={setShowResults}
+                            />
+                        </div>
+
+                        {/* RESULT COMPONENT */}
+                        <div className={`${showResults ? "block" : "hidden md:block"} w-full md:w-2/3`}>
+                            <AIResultComponent 
+                                results={results} 
+                                isSearching={isSearching}
+                                setShowResults={setShowResults}
+                            />
+                        </div>
+
                     </div>
+
                     </motion.div>
 
                     {/* Bottom Colors */}

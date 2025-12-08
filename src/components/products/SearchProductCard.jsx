@@ -6,11 +6,26 @@ import { auth } from "../../firebase";
 import { setDoc, deleteDoc, getDocs } from "firebase/firestore";
 import { Heart } from "lucide-react";
 import toast from "react-hot-toast";
+import { useUserCountry } from "../../hooks/useUserCountry";
 
 const SearchProductCard = ({ product }) => {
   const [wishlistIds, setWishlistIds] = useState([]);
 
   const navigate = useNavigate(); 
+  
+  const {marketplace, currency, loadingCountry} = useUserCountry();
+
+  const getCurrencySymbol = (currency) => {
+    switch(currency){
+      case "EUR": return "€";
+      case "GBP": return "£";
+      default: return "€";
+    }
+  }
+
+  const displayPrice = product.prices?.[marketplace] ?? product.prices?.de ?? null;
+
+  const priceSymbol = getCurrencySymbol(currency);
 
   const toggleWishlist = async (productId) => {
     const user = auth.currentUser;
@@ -150,7 +165,7 @@ const SearchProductCard = ({ product }) => {
         >
           {/* PRICE */}
           <h2 className="text-lg sm:text-xl font-bold text-[#44A77D]">
-            {product.price}
+            {loadingCountry ? "loading...." : displayPrice !== null ? `${priceSymbol}${displayPrice?.toFixed(2)}` : "Price unavailable"}
           </h2>
 
           {/* BUTTONS */}

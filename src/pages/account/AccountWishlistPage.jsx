@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { db, auth } from "../../firebase";
-import { collection, getDocs, doc, getDoc } from "firebase/firestore";   
+import { collection, getDocs, doc, getDoc, deleteDoc } from "firebase/firestore";   
 import WishlistCard from "../../components/products/WishlistCard"; 
 
 const AccountWishlistPage = () => {
@@ -20,14 +20,19 @@ const AccountWishlistPage = () => {
                 const productPromises = productIds.map(async (id) => {
                     const productRef = doc(db, "products", id);
                     const productSnap = await getDoc(productRef);
+
+                    if(!productSnap.exists()){
+                        await deleteDoc(doc(db, "users", user.uid, "wishlist", id));
+                        return
+                    }
                     return { id, ...productSnap.data() };
                 });
     
-                const result = await Promise.all(productPromises);
+                const result = (await Promise.all(productPromises)).filter(Boolean);
                 setItems(result);
             }
-            load();
-        },[]);
+        load();
+    },[]);
     
     return(
         <div className="w-full flex flex-col">
