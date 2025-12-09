@@ -242,7 +242,8 @@ const ProductDetails = () =>{
             </p>
 
             <button
-            onClick={() => window.open(`/go/${product.asin}`, "_blank")}
+            //onClick={() => window.open(`/go/${product.asin}`, "_blank")}
+            onClick={() => window.location.href = `/go/${product.asin}`}
             className="w-full bg-[#44A77D] hover:bg-[#368866] transition text-white font-semibold py-3 rounded-lg mb-8"
             >
             Buy this product →
