@@ -1,4 +1,4 @@
-import AccountSidebar from "../../components/account/accountSidebar"
+import AccountSidebar from "../../components/account/AccountSidebar"
 import { Outlet, useNavigate } from "react-router-dom"
 import { useEffect, useState } from "react";
 import { onAuthStateChanged } from "firebase/auth";

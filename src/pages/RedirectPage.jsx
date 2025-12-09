@@ -25,11 +25,12 @@ const AFFILIATE_TAGS = {
 
 const RedirectPage = () => {
   const { asin } = useParams();
-
   const { marketplace, loadingCountry } = useUserCountry();
 
+  if (typeof window === "undefined") return null;
+
   useEffect(() => {
-    if (loadingCountry) return;
+    if (loadingCountry || !marketplace) return;
 
     const redirectNow = () => {
 
@@ -43,8 +44,8 @@ const RedirectPage = () => {
 
       // App-safe redirect
       setTimeout(() => {
-        window.location.replace(finalUrl);
-      }, 300);
+        window.location.assign(finalUrl);
+      }, 1000);
     };
 
     redirectNow();
