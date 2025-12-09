@@ -1,59 +1,71 @@
 import { useState } from "react";
-import { db } from "../../firebase";
-import { addDoc, collection, serverTimestamp, getDoc } from "firebase/firestore";
-import { auth } from "../../firebase";
+import { db, auth } from "../../firebase";
+import { addDoc, collection, serverTimestamp, doc, getDoc } from "firebase/firestore";
+import toast from "react-hot-toast";
 
 const AdminPage = () => {
   const [formData, setFormData] = useState({
     name: "",
     description: "",
-    category: "Tech Gifts",
-    price: "",
-    currency: "EUR",
-    affiliateId: "",
+    category: "",
+    asin: "",
     affiliateLink: "",
-    platform: "Bol.com",
-    image: "",
+    platform: "Amazon",
     images: "",
     tags: "",
     isFeatured: false,
+
+    // NEW EU marketplace prices
+    prices: {
+      nl: "",
+      de: "",
+      fr: "",
+      it: "",
+      es: "",
+      couk: "",
+    },
   });
 
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState(false);
 
-  // Preview main image
-  const mainImagePreview = formData.image?.trim().length > 5 ? formData.image : null;
-
-  // Handle all changes
+  // Handle input change (supports nested prices)
   const handleChange = (e) => {
-    const { name, value, type, checked } = e.target;
+    const { name, value, type, checked, dataset } = e.target;
+
+    // Handle marketplace price change
+    if (dataset.marketplace) {
+      const market = dataset.marketplace;
+      setFormData((prev) => ({
+        ...prev,
+        prices: {
+          ...prev.prices,
+          [market]: value,
+        },
+      }));
+      return;
+    }
+
+    // Normal fields
     setFormData((prev) => ({
       ...prev,
       [name]: type === "checkbox" ? checked : value,
     }));
   };
 
-  // Form validation
+  // Validation
   const validate = () => {
     if (!formData.name.trim()) return "Name is required.";
     if (!formData.description.trim()) return "Description is required.";
-    if (!formData.image.trim()) return "Main image URL is required.";
+    if (!formData.images.trim()) return "At least one image is required.";
     if (!formData.affiliateLink.trim()) return "Affiliate link is required.";
-    if (isNaN(parseFloat(formData.price)) || parseFloat(formData.price) <= 0)
-      return "Price must be a valid number greater than 0.";
 
-    if (
-      formData.image &&
-      !formData.image.startsWith("http")
-    )
-      return "Main image URL must start with http or https.";
-
-    if (
-      formData.affiliateLink &&
-      !formData.affiliateLink.startsWith("http")
-    )
-      return "Affiliate link must start with http or https.";
+    // Validate the 6 EU prices
+    for (const [market, value] of Object.entries(formData.prices)) {
+      if (value === "" || isNaN(parseFloat(value)) || parseFloat(value) <= 0) {
+        return `Invalid price for marketplace: ${market.toUpperCase()}`;
+      }
+    }
 
     return null;
   };
@@ -62,15 +74,16 @@ const AdminPage = () => {
     e.preventDefault();
 
     const user = auth.currentUser;
-    if(!user){
-      alert("You must be logged in as an admin!");
+    if (!user) {
+      toast.error("You must be logged in as an admin!");
       return;
     }
-    
+
     const ref = doc(db, "users", user.uid);
     const snap = await getDoc(ref);
-    if(!snap.exists() || snap.data().role !== "admin"){
-      alert("Unauthorized access!");
+
+    if (!snap.exists() || snap.data().role !== "admin") {
+      toast.error("Unauthorized access!");
       return;
     }
 
@@ -79,7 +92,7 @@ const AdminPage = () => {
 
     const errorMessage = validate();
     if (errorMessage) {
-      alert(errorMessage);
+      toast.error(errorMessage);
       setLoading(false);
       return;
     }
@@ -89,12 +102,9 @@ const AdminPage = () => {
         name: formData.name.trim(),
         description: formData.description.trim(),
         category: formData.category,
-        price: parseFloat(formData.price),
-        currency: formData.currency,
-        affiliateId: formData.affiliateId.trim(),
+        asin: formData.asin.trim(),
         affiliateLink: formData.affiliateLink.trim(),
         platform: formData.platform,
-        image: formData.image.trim(),
         images: formData.images
           .split(",")
           .map((url) => url.trim())
@@ -106,28 +116,45 @@ const AdminPage = () => {
           .filter((tag) => tag !== ""),
         clickCount: 0,
         createdAt: serverTimestamp(),
-      });
+
+        // Save EU prices as numbers
+        prices: {
+          nl: parseFloat(formData.prices.nl),
+          de: parseFloat(formData.prices.de),
+          fr: parseFloat(formData.prices.fr),
+          it: parseFloat(formData.prices.it),
+          es: parseFloat(formData.prices.es),
+          couk: parseFloat(formData.prices.couk),
+        },
+
+        pricesLastUpdated: {
+          nl: serverTimestamp(),  
+          de: serverTimestamp(),
+          fr: serverTimestamp(),
+          it: serverTimestamp(),
+          es: serverTimestamp(),
+          couk: serverTimestamp(),
+        }
+    });
 
       setSuccess(true);
 
-      // Reset form
+      // Reset
       setFormData({
         name: "",
         description: "",
-        category: "Tech Gifts",
-        price: "",
-        currency: "EUR",
-        affiliateId: "",
+        category: "",
+        asin: "",
         affiliateLink: "",
-        platform: "Bol.com",
-        image: "",
+        platform: "Amazon",
         images: "",
         tags: "",
         isFeatured: false,
+        prices: { nl: "", de: "", fr: "", it: "", es: "", couk: "" },
       });
     } catch (error) {
       console.error("Error adding product:", error);
-      alert("Er ging iets mis bij het toevoegen.");
+      toast.error("Error adding product.");
     } finally {
       setLoading(false);
     }
@@ -147,7 +174,6 @@ const AdminPage = () => {
           placeholder="Product name"
           value={formData.name}
           onChange={handleChange}
-          required
           className="border p-2 rounded w-full"
         />
 
@@ -157,7 +183,6 @@ const AdminPage = () => {
           placeholder="Description"
           value={formData.description}
           onChange={handleChange}
-          required
           className="border p-2 rounded w-full h-24"
         />
 
@@ -168,40 +193,34 @@ const AdminPage = () => {
           onChange={handleChange}
           className="border p-2 rounded w-full"
         >
-          <option>For Her</option>
-          <option>For Him</option>
-          <option>Tech Gifts</option>
-          <option>Home & Living</option>
-          <option>Funny Gifts</option>
-          <option>Luxury Picks</option>
-          <option>For Kids</option>
+          <option>for-her</option>
+          <option>for-him</option>
+          <option>tech</option>
+          <option>home_living</option>
+          <option>funny</option>
+          <option>luxury</option>
+          <option>kids</option>
         </select>
 
-        {/* PRICE + CURRENCY */}
-        <div className="flex gap-2">
-          <input
-            name="price"
-            type="number"
-            placeholder="Price"
-            value={formData.price}
-            onChange={handleChange}
-            required
-            className="border p-2 rounded w-full"
-          />
-          <input
-            name="currency"
-            placeholder="EUR / USD / etc."
-            value={formData.currency}
-            onChange={handleChange}
-            className="border p-2 rounded w-24"
-          />
+        {/* EU MARKETPLACE PRICES */}
+        <div className="grid grid-cols-2 gap-2">
+          {["nl", "de", "fr", "it", "es", "couk"].map((mkt) => (
+            <input
+              key={mkt}
+              data-marketplace={mkt}
+              placeholder={`Price (${mkt.toUpperCase()})`}
+              value={formData.prices[mkt]}
+              onChange={handleChange}
+              className="border p-2 rounded w-full"
+            />
+          ))}
         </div>
 
         {/* AFFILIATE ID */}
         <input
-          name="affiliateId"
-          placeholder="Affiliate ID (EAN)"
-          value={formData.affiliateId}
+          name="asin"
+          placeholder="ASIN"
+          value={formData.asin}
           onChange={handleChange}
           className="border p-2 rounded w-full"
         />
@@ -209,10 +228,9 @@ const AdminPage = () => {
         {/* AFFILIATE LINK */}
         <input
           name="affiliateLink"
-          placeholder="Affiliate link (Bol/Amazon)"
+          placeholder="Affiliate link"
           value={formData.affiliateLink}
           onChange={handleChange}
-          required
           className="border p-2 rounded w-full"
         />
 
@@ -223,39 +241,35 @@ const AdminPage = () => {
           onChange={handleChange}
           className="border p-2 rounded w-full"
         >
-          <option>Bol.com</option>
           <option>Amazon</option>
-          <option>Coolblue</option>
-          <option>AliExpress</option>
         </select>
-
-        {/* MAIN IMAGE */}
-        <input
-          name="image"
-          placeholder="Main image URL"
-          value={formData.image}
-          onChange={handleChange}
-          required
-          className="border p-2 rounded w-full"
-        />
-
-        {/* IMAGE PREVIEW */}
-        {mainImagePreview && (
-          <img
-            src={mainImagePreview}
-            alt="preview"
-            className="w-32 h-32 object-contain mx-auto rounded-lg shadow-md mt-2"
-          />
-        )}
 
         {/* EXTRA IMAGES */}
         <input
           name="images"
-          placeholder="Extra image URLs (comma separated)"
+          placeholder="Extra images (comma separated)"
           value={formData.images}
           onChange={handleChange}
           className="border p-2 rounded w-full"
         />
+        
+        {/* IMAGE PREVIEW GALLERY */}
+        {formData.images.trim().length > 0 && (
+          <div className="flex gap-3 overflow-x-auto mt-3 p-2 bg-gray-50 rounded-lg">
+            {formData.images
+              .split(",")
+              .map((url, i) => url.trim())
+              .filter((url) => url !== "")
+              .map((url, i) => (
+                <img
+                  key={i}
+                  src={url}
+                  alt={`preview-${i}`}
+                  className="w-20 h-20 object-contain rounded border shadow-sm flex-shrink-0"
+                />
+              ))}
+          </div>
+        )}
 
         {/* TAGS */}
         <input
@@ -277,20 +291,16 @@ const AdminPage = () => {
           <span>Featured product</span>
         </label>
 
-        {/* SUBMIT BUTTON */}
+        {/* SUBMIT */}
         <button
           type="submit"
           disabled={loading}
-          className="w-full bg-[#44A77D] text-white py-2 rounded-lg font-semibold hover:bg-[#3b936e] transition"
+          className="w-full bg-[#44A77D] text-white py-2 rounded-lg font-semibold hover:bg-[#3b936e]"
         >
           {loading ? "Adding..." : "Add Product"}
         </button>
 
-        {success && (
-          <p className="text-green-600 font-semibold text-center mt-2">
-            ✅ Product added successfully!
-          </p>
-        )}
+        {success && <p className="text-green-600 text-center mt-2">✅ Product added!</p>}
       </form>
     </div>
   );

@@ -6,6 +6,10 @@ import { db } from "../../firebase";
 import { setDoc, deleteDoc, getDocs, doc } from "firebase/firestore";
 import { collection, getDoc } from "firebase/firestore";
 import { Heart } from "lucide-react";
+import toast from "react-hot-toast";
+import { useUserCountry } from "../../hooks/useUserCountry";
+import { AllowedMarketPlaces } from "../../config/AllowedMarketplaces";
+import { useRef } from "react";
 
 
 const ProductDetails = () =>{
@@ -15,10 +19,50 @@ const ProductDetails = () =>{
     const [expanded, setExpanded] = useState(false);
     const [loading, setLoading] = useState(true);
     const [wishlistIds, setWishlistIds] = useState([]);
+    const [activeImage, setActiveImage] = useState(0);
+    const thumbnailsRef = useRef(null);
+
+    const scrollThumbnails = (direction) => {
+        if (!thumbnailsRef.current) return;
+
+        const container = thumbnailsRef.current;
+        const scrollAmount = 5 * 80; // 5 thumbnails × (70px + gap)
+
+        container.scrollBy({
+            left: direction === "right" ? scrollAmount : -scrollAmount,
+            behavior: "smooth"
+        });
+    };
+
+    const {marketplace, currency, loadingCountry} = useUserCountry();
+
+    const canShowPrice = AllowedMarketPlaces.includes(marketplace);
+    
+    const getCurrencySymbol = (currency) => {
+        switch(currency){
+        case "EUR": return "€";
+        case "GBP": return "£";
+        default: return "€";
+        }
+    }
+
+    const formatTimeStamp = (ts) => {
+        if (!ts) return "Not updated yet";
+
+        const date = ts.toDate();
+
+        return date.toLocaleString("en-GB",{
+            day: "2-digit",
+            month: "short",
+            year: "numeric",
+            hour: "2-digit",
+            minute: "2-digit"
+        })
+    }
 
     const toggleWishlist = async (productId) => {
     const user = auth.currentUser;
-    if (!user) return alert("Log in to save products to your favorites!");
+    if (!user) return toast.error("Log in to save products to your favorites!");
 
     const itemRef = doc(db, "users", user.uid, "wishlist", productId);
 
@@ -87,6 +131,11 @@ const ProductDetails = () =>{
         </div>
         );
     }
+    const displayPrice = product.prices?.[marketplace] ?? product.prices?.de ?? null;
+
+    const displayPriceLastUpdated = product.pricesLastUpdated?.[marketplace] ?? null;
+    
+    const priceSymbol = getCurrencySymbol(currency);
 
     return (
     <div className="w-full max-w-[1200px] mx-auto px-4 py-10">
@@ -94,31 +143,83 @@ const ProductDetails = () =>{
         {/* MAIN CONTENT */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
 
-        {/* IMAGE + WISHLIST BUTTON */}
-        <motion.div
-            initial={{ opacity: 0, y: 30 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.4 }}
-            className="relative w-full flex h-[320px] sm:h-[360px] md:h-[380px] lg:h-[420px] xl:h-[450px] items-center justify-center bg-[#F5FAF7] rounded-xl p-6"
-        >
-            {/* WISHLIST BUTTON */}
-            <button
-            onClick={(e) => {
-                e.stopPropagation();
-                toggleWishlist(product.id)
-            }}
-            className="absolute top-4 right-4 bg-white/90 hover:bg-white shadow-md rounded-full p-2 transition"
-            >
-            <Heart className={`w-6 h-6 transition ${wishlistIds.includes(product.id) ? "text-red-500 fill-red-500" : "text-gray-700 hover:text-red-500"}`} />
-            </button>
+            {/* IMAGE + WISHLIST + IMAGE SELECTOR BUTTON WRAPPER */}
+            <div className="flex flex-col items-center w-full">
 
-            {/* IMAGE */}
-            <img
-            src={product.image}
-            alt={product.name}
-            className="w-full h-full  object-contain"
-            />
-        </motion.div>
+                {/* IMAGE + WISHLIST BUTTON */}
+                <motion.div
+                    initial={{ opacity: 0, y: 30 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.4 }}
+                    className="relative w-full flex flex-col h-[320px] sm:h-[360px] md:h-[380px] lg:h-[420px] xl:h-[450px] items-center justify-center rounded-xl p-6"
+                >
+                    {/* WISHLIST BUTTON */}
+                    <button
+                    onClick={(e) => {
+                        e.stopPropagation();
+                        toggleWishlist(product.id)
+                    }}
+                    className="absolute top-4 right-4 bg-white/90 hover:bg-white shadow-md rounded-full p-2 transition"
+                    >
+                    <Heart className={`w-6 h-6 transition ${wishlistIds.includes(product.id) ? "text-red-500 fill-red-500" : "text-gray-700 hover:text-red-500"}`} />
+                    </button>
+
+                    {/* IMAGE */}
+                    <img
+                    src={product.images?.[activeImage]}
+                    alt={product.name}
+                    className="w-full h-full  object-contain"
+                    />
+                </motion.div>
+
+                {/* IMAGE SELECTOR WRAPPED FOR DESKTOP BUTTONS */}
+                <div className="relative w-full mt-4">
+
+                    {/* LEFT BUTTON (DESKTOP ONLY) */}
+                    <button
+                        onClick={() => scrollThumbnails("left")}
+                        className="hidden md:flex absolute left-0 top-1/2 -translate-y-1/2 
+                                bg-white shadow-md rounded-full p-2 z-20 hover:bg-gray-100"
+                    >
+                        ◀
+                    </button>
+
+                    {/* THUMBNAIL SCROLL AREA */}
+                    <div
+                        ref={thumbnailsRef}
+                        className="flex gap-3 p-1 overflow-x-auto overflow-y-hidden flex-nowrap scroll-smooth no-scrollbar px-10"
+                    >
+                        {product.images?.map((img, index) => (
+                            <button
+                                key={index}
+                                onClick={() => setActiveImage(index)}
+                                className={`border rounded-lg p-1 w-[70px] h-[70px] flex-shrink-0 flex items-center justify-center transition
+                                    ${
+                                        activeImage === index
+                                            ? "border-[#44A77D] scale-105"
+                                            : "border-gray-300"
+                                    }`}
+                            >
+                                <img
+                                    src={img}
+                                    alt="thumbnail"
+                                    className="object-contain w-full h-full rounded"
+                                />
+                            </button>
+                        ))}
+                    </div>
+
+                    {/* RIGHT BUTTON (DESKTOP ONLY) */}
+                    <button
+                        onClick={() => scrollThumbnails("right")}
+                        className="hidden md:flex absolute right-0 top-1/2 -translate-y-1/2 
+                                bg-white shadow-md rounded-full p-2 z-20 hover:bg-gray-100"
+                    >
+                        ▶
+                    </button>
+                </div>
+            </div>
+
 
         {/* INFO */}
         <motion.div
@@ -129,9 +230,11 @@ const ProductDetails = () =>{
             <h1 className="text-3xl font-bold text-gray-800 mb-4">
             {product.name}
             </h1>
-
+            <p className="text-sm font-semibold mb-2">
+                {!canShowPrice ? "" : loadingCountry ? "loading...." : displayPriceLastUpdated ? `Last updated: ${formatTimeStamp(displayPriceLastUpdated)}` : "No update available"}
+            </p>
             <p className="text-xl font-semibold text-[#44A77D] mb-2">
-            €{product.price}
+               {!canShowPrice ? `Check price on ${product.platform}` : loadingCountry ? "loading...." : displayPrice ? `${priceSymbol}${displayPrice?.toFixed(2)}`: "Price unavailable"}
             </p>
 
             <p className="text-sm text-gray-500 mb-6">
@@ -139,7 +242,7 @@ const ProductDetails = () =>{
             </p>
 
             <button
-            onClick={() => window.open(product.affiliateLink, "_blank")}
+            onClick={() => window.open(`/go/${product.asin}`, "_blank")}
             className="w-full bg-[#44A77D] hover:bg-[#368866] transition text-white font-semibold py-3 rounded-lg mb-8"
             >
             Buy this product →
@@ -154,7 +257,7 @@ const ProductDetails = () =>{
                         className="relative overflow-hidden"
                     >
                         <p className="text-gray-700 leading-relaxed max-w-prose break-words">
-                            {product.description || "Dit product heeft nog geen beschrijving."}
+                            {product.description || "This product has no description."}
                         </p>
 
                         {/* Fade overlay when collapsed */}

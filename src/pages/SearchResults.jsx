@@ -84,7 +84,7 @@ const SearchResults = () => {
       {filtered.length === 0 ? (
         <p>No products found.</p>
       ) : (
-        <div className="flex flex-col">
+        <div className="flex flex-col gap-5">
           {filtered.map((product) => (
             <SearchProductCard key={product.id} product={product} />
           ))}

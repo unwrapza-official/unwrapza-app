@@ -13,6 +13,7 @@ import home_living from "../assets/categories/Home_living.png"
 import funny_gifts from "../assets/categories/Funny_gifts.png"
 import luxury_picks from "../assets/categories/Luxury_picks.png"
 import For_kids from "../assets/categories/For_kids.png"
+import MarketplaceIndicator from './MarketplaceIndicator';
 
 const Header = () => {
 
@@ -30,13 +31,13 @@ const Header = () => {
     }
 
     const categories = [
-        { name: "For Her", path: "/for-her", image: for_her },
-        { name: "For Him", path: "/for-him", image: for_him },
-        { name: "Tech Gifts", path: "/tech", image: tech_gifts },
-        { name: "Home & Living", path: "/home_living", image: home_living },
-        { name: "Funny Gifts", path: "/funny", image: funny_gifts },
-        { name: "Luxury Picks", path: "/luxury", image: luxury_picks },
-        { name: "For Kids", path: "/kids", image: For_kids },
+        { name: "For Her", path: "/category/for-her", image: for_her, slug: "for-her",  },
+        { name: "For Him", path: "/category/for-him", image: for_him, slug: "for-him", },
+        { name: "Tech Gifts", path: "/category/tech", image: tech_gifts, slug: "tech", },
+        { name: "Home & Living", path: "/category/home_living", image: home_living, slug: "home_living", },
+        { name: "Funny Gifts", path: "/category/funny", image: funny_gifts, slug: "funny", },
+        { name: "Luxury Picks", path: "/category/luxury", image: luxury_picks, slug: "luxury", },
+        { name: "For Kids", path: "/category/kids", image: For_kids, slug: "kids", },
     ];
 
     useEffect(() => {
@@ -64,7 +65,7 @@ const Header = () => {
                 <div className="px-4 w-full max-w-[1200px] mx-auto">
                     {/* Upper Main Header */}
                     <div className="relative flex justify-center py-5 px-0">
-                        <div className="w-full flex items-center px-2 md:px-0">
+                        <div className="w-full flex items-center px-0 md:px-0">
                             
                             {/* Hamburger + Logo (mobiel) */}
                             <div className="flex w-auto md:w-1/3 justify-start items-center gap-2 md:hidden">
@@ -100,7 +101,7 @@ const Header = () => {
 
                             {/* Slogan (desktop only) */}
                             <div className="hidden md:flex w-1/3 justify-start items-center">
-                            <p className="font-roboto italic font-semibold text-[#44A77D] text-lg tracking-wide leading-snug hover:text-[#84B9FF] transition-colors duration-300 w-full max-w-[250px]">
+                            <p className="font-roboto italic font-semibold text-[#44A77D] md:text-md xl:text-lg tracking-wide leading-snug hover:text-[#84B9FF] transition-colors duration-300 w-full max-w-[250px]">
                                 Because the best gifts are found, not searched
                             </p>
                             </div>
@@ -114,8 +115,13 @@ const Header = () => {
                              </Link>
                             </div>
 
+                            {/* Country (Mobiel) */}
+                            <div className='block sm:hidden absolute right-15'>
+                                <MarketplaceIndicator/>
+                            </div>
+
                             {/* Buttons (altijd tegen rechterkant) */}
-                            <div className="absolute right-0 sm:right-0 top-1/2 -translate-y-1/2 flex gap-3 sm:gap-6 md:gap-5 items-end">
+                            <div className="absolute right-0 sm:right-0 top-1/2 -translate-y-1/2 flex sm:gap-4 md:gap-3 items-end">
                             
                             <Link to={auth.currentUser ? "/account" : "/login"}
                             className="flex flex-col items-center">
@@ -147,7 +153,10 @@ const Header = () => {
 
                     {/* Searchbar */}
                     <div className="flex justify-center my-[10px] relative px-[16px]">
-                        <div className="relative w-full max-w-[600px]">
+                        <div className='hidden sm:block absolute left-[0px] top-1/2 -translate-y-1/2'>
+                            <MarketplaceIndicator/>
+                        </div>
+                        <div className="relative w-full max-w-[400px] md:max-w-[550px] xl:max-w-[600px]">
                             <input
                             type="text"
                             placeholder="Search for products, brands and more"

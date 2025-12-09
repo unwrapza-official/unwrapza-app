@@ -5,7 +5,7 @@ import AICarousel from "./AICarousel";
 import { doc, getDoc } from "firebase/firestore";
 import { db } from "../../firebase";
 
-const AIResultComponent = ({results, isSearching}) => {
+const AIResultComponent = ({results, isSearching, setShowResults}) => {
     const [products, setProducts] = useState([]);
 
     useEffect(() => {
@@ -28,9 +28,21 @@ const AIResultComponent = ({results, isSearching}) => {
     }, [results]);
 
     return (
-        <div className="w-2/3 h-full flex flex-col gap-4">
-            {isSearching && <SearchingAnimation/>}
+        <div className=" h-full flex flex-col gap-5">
+            <div className="w-full flex items-center">
+                {!isSearching && (
+                <button
+                    onClick={() => setShowResults(false)}
+                    className="md:hidden px-2 py-1 bg-white text-green font-bold 
+                            rounded-lg shadow-[4px_4px_0_#ffffff] border-2 border-white
+                            active:scale-95 transition-all"
+                >
+                    ← Back
+                </button>
+                )}
+            </div>
 
+            {isSearching && <SearchingAnimation/>}
 
             {!isSearching && products.length === 0 && (
                 <AISkeletonCard/>

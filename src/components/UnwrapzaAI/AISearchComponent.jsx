@@ -1,6 +1,8 @@
 import { useState } from 'react';
+import toast from 'react-hot-toast';
+import { useUserCountry } from '../../hooks/useUserCountry';
 
-const AISearchComponent = ({setResults, setIsSearching}) => {
+const AISearchComponent = ({setResults, setIsSearching, setShowResults}) => {
   const [relative, setRelative] = useState('');
   const [age, setAge] = useState('');
   const [purpose, setPurpose] = useState('');
@@ -11,6 +13,8 @@ const AISearchComponent = ({setResults, setIsSearching}) => {
   const [errorMessage, setErrorMessage] = useState("");
   const [loading, setLoading] = useState(false);
 
+  const {marketplace} = useUserCountry();
+
   const formatPrice = (value) => {
     if (!value) return "";
     const num = parseFloat(value.replace(",", "."));
@@ -20,7 +24,6 @@ const AISearchComponent = ({setResults, setIsSearching}) => {
   
   const handleClick = async (e) => {
     e.preventDefault();
-    setIsSearching(true);
 
     const errors = [];
 
@@ -32,9 +35,12 @@ const AISearchComponent = ({setResults, setIsSearching}) => {
     if(!maxPrice) errors.push("Please enter a maximum price.");
 
     if(errors.length > 0){
-      alert(errors.join("\n"))
+      toast.error(errors.join("\n"))
       return
     }
+    
+    setIsSearching(true);
+    setShowResults(true);
 
     const formData = {
       relative,
@@ -44,6 +50,7 @@ const AISearchComponent = ({setResults, setIsSearching}) => {
       context,
       minPrice: Number(minPrice),
       maxPrice: Number(maxPrice),
+      marketplace,
     };
 
     console.log(formData);
@@ -84,7 +91,7 @@ const AISearchComponent = ({setResults, setIsSearching}) => {
   }
 
   return (
-    <div className="w-full md:w-1/3 h-full flex flex-col items-center md:items-start">
+    <div className=" h-full flex flex-col items-center md:items-start">
       {/* Search container */}
       <div className="w-9/10 h-full flex flex-col justify-evenly">
         <h1 className="italic font-roboto font-bold text-white text-[26px]">

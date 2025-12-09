@@ -5,15 +5,33 @@ import { useEffect, useState } from "react";
 import { auth } from "../../firebase";
 import { setDoc, deleteDoc, getDocs } from "firebase/firestore";
 import { Heart } from "lucide-react";
+import toast from "react-hot-toast";
+import { useUserCountry } from "../../hooks/useUserCountry";
+import { AllowedMarketPlaces } from "../../config/AllowedMarketplaces";
 
 const SearchProductCard = ({ product }) => {
   const [wishlistIds, setWishlistIds] = useState([]);
 
   const navigate = useNavigate(); 
+  
+  const {marketplace, currency, loadingCountry} = useUserCountry();
+  const canShowPrice = AllowedMarketPlaces.includes(marketplace);
+
+  const getCurrencySymbol = (currency) => {
+    switch(currency){
+      case "EUR": return "€";
+      case "GBP": return "£";
+      default: return "€";
+    }
+  }
+
+  const displayPrice = product.prices?.[marketplace] ?? product.prices?.de ?? null;
+
+  const priceSymbol = getCurrencySymbol(currency);
 
   const toggleWishlist = async (productId) => {
     const user = auth.currentUser;
-    if (!user) return alert("Log in to save products to your favorites!");
+    if (!user) return toast.error("Log in to save products to your favorites!");
 
     const itemRef = doc(db, "users", user.uid, "wishlist", productId);
 
@@ -87,7 +105,7 @@ const SearchProductCard = ({ product }) => {
         "
       >
         <img
-          src={product.image}
+          src={product.images?.[0]}
           alt={product.name}
           className="
             w-5/6 h-5/6 object-contain 
@@ -149,7 +167,7 @@ const SearchProductCard = ({ product }) => {
         >
           {/* PRICE */}
           <h2 className="text-lg sm:text-xl font-bold text-[#44A77D]">
-            {product.price}
+            { !canShowPrice ? "" : loadingCountry ? "loading...." : displayPrice !== null ? `${priceSymbol}${displayPrice?.toFixed(2)}` : "Price unavailable"}
           </h2>
 
           {/* BUTTONS */}

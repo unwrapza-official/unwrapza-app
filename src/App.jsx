@@ -20,23 +20,61 @@ import Disclaimer from './pages/legal/Disclaimer'
 import TermsConditions from './pages/legal/TermsConditions'
 import PrivacyPolicy from './pages/legal/PrivacyPolicy'
 import CookiePolicy from './pages/legal/CookiePolicy'
+import CategoryPage from './pages/CategoryPage'
 import About from './pages/About'
+import {Toaster} from 'react-hot-toast';
+import RedirectPage from './pages/RedirectPage'
 
 function App() {
   const location = useLocation();
 
-  const emptyPages = [
-    "/login",
-    "/admin",
-  ]
-
-  const disableComponent = emptyPages.includes(location.pathname);
+  const disableComponent = 
+    location.pathname.startsWith("/go/") ||
+    location.pathname === "/login" ||
+    location.pathname === "/admin";
   
   return (
     <>
       <UpperColors/>
       {!disableComponent && <Header />}
       <ScrollToTop/>
+      <Toaster 
+        position="top-right"
+        toastOptions={{
+          // DEFAULT TOAST STYLE
+          style: {
+            background: "#ffffff",
+            color: "#333",
+            borderRadius: "12px",
+            padding: "12px 16px",
+            border: "1px solid #e5e7eb",
+            fontSize: "14px",
+            fontWeight: 500,
+          },
+          
+          // SUCCESS TOAST STYLE
+          success: {
+            iconTheme: {
+              primary: "#44A77D",
+              secondary: "#ffffff",
+            },
+            style: {
+              border: "1px solid #44A77D",
+            },
+          },
+
+          // ERROR TOAST STYLE
+          error: {
+            iconTheme: {
+              primary: "#e11d48",
+              secondary: "#ffffff",
+            },
+            style: {
+              border: "1px solid #e11d48",
+            },
+          },
+        }}
+      />
       <Routes>
         <Route path="/" element={<HomePage />}/>
         <Route path="/about" element={<About/>}/>
@@ -50,10 +88,12 @@ function App() {
           <Route path="people" element={<MyPeoplePage />} />
           <Route path="wishlist" element={<WishlistPage />} />
         </Route>
+        <Route path="/category/:slug" element={<CategoryPage/>}/>
         <Route path="/login" element={<LoginPage />}/>
         <Route path="/admin" element={<AdminRoute><AdminPage /></AdminRoute>}/>
         <Route path ="/product/:id" element={<ProductDetails/>}/>
         <Route path="/search" element={<SearchResults />}/>
+        <Route path="/go/:asin" element={<RedirectPage/>}/>
         <Route path="/*" element={<NotFoundPage/>}/>
       </Routes>
       {!disableComponent && <Footer/>}
