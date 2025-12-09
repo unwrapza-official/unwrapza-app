@@ -17,7 +17,7 @@ const MARKETPLACE_MAP = {
     HR: "de",   // Kroatië gebruikt EUR sinds 2023
 
     // NEW → Ierland gebruikt Amazon UK als primair
-    IE: "uk",   // Amazon.co.uk levert aan Ierland, grootste marketplace voor IE
+    IE: "couk",   // Amazon.co.uk levert aan Ierland, grootste marketplace voor IE
 
     // Microstates (optioneel, hebben EUR)
     MC: "fr",   // Monaco
@@ -39,8 +39,8 @@ const MARKETPLACE_MAP = {
     BG: "de",   // Bulgarije (BGN)
     MT: "it",   // Malta (EUR)
 
-    UK: "uk",   // Verenigd Koninkrijk (Amazon.co.uk)
-    GB: "uk",   // Sommige browsers gebruiken GB als landcode
+    UK: "couk",   // Verenigd Koninkrijk (Amazon.co.uk)
+    GB: "couk",   // Sommige browsers gebruiken GB als landcode
 
     // fallback fallback → als landcode onbekend is → Duitsland
     DEFAULT: "de",
@@ -67,7 +67,7 @@ export function useUserCountry() {
                 setMarketplace(mappedMarket);
 
                 // EU currencies (keep simple for MVP)
-                if (mappedMarket === "uk") {
+                if (mappedMarket === "couk") {
                     setCurrency("GBP");
                 } else {
                     setCurrency("EUR");

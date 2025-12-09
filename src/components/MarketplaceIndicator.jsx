@@ -7,7 +7,7 @@ const FLAG_MAP = {
   fr: "FR",
   it: "IT",
   es: "ES",
-  uk: "GB",
+  couk: "GB",
 };
 
 const MarketplaceIndicator = () => {

@@ -7,10 +7,10 @@ const AdminPage = () => {
   const [formData, setFormData] = useState({
     name: "",
     description: "",
-    category: "Tech Gifts",
-    affiliateId: "",
+    category: "",
+    asin: "",
     affiliateLink: "",
-    platform: "Bol.com",
+    platform: "Amazon",
     image: "",
     images: "",
     tags: "",
@@ -23,7 +23,7 @@ const AdminPage = () => {
       fr: "",
       it: "",
       es: "",
-      uk: "",
+      couk: "",
     },
   });
 
@@ -106,7 +106,7 @@ const AdminPage = () => {
         name: formData.name.trim(),
         description: formData.description.trim(),
         category: formData.category,
-        affiliateId: formData.affiliateId.trim(),
+        asin: formData.asin.trim(),
         affiliateLink: formData.affiliateLink.trim(),
         platform: formData.platform,
         image: formData.image.trim(),
@@ -129,11 +129,18 @@ const AdminPage = () => {
           fr: parseFloat(formData.prices.fr),
           it: parseFloat(formData.prices.it),
           es: parseFloat(formData.prices.es),
-          uk: parseFloat(formData.prices.uk),
+          couk: parseFloat(formData.prices.couk),
         },
 
-        lastPriceUpdate: serverTimestamp(),
-      });
+        pricesLastUpdated: {
+          nl: serverTimestamp(),  
+          de: serverTimestamp(),
+          fr: serverTimestamp(),
+          it: serverTimestamp(),
+          es: serverTimestamp(),
+          couk: serverTimestamp(),
+        }
+    });
 
       setSuccess(true);
 
@@ -141,15 +148,15 @@ const AdminPage = () => {
       setFormData({
         name: "",
         description: "",
-        category: "Tech Gifts",
-        affiliateId: "",
+        category: "",
+        asin: "",
         affiliateLink: "",
-        platform: "Bol.com",
+        platform: "Amazon",
         image: "",
         images: "",
         tags: "",
         isFeatured: false,
-        prices: { nl: "", de: "", fr: "", it: "", es: "", uk: "" },
+        prices: { nl: "", de: "", fr: "", it: "", es: "", couk: "" },
       });
     } catch (error) {
       console.error("Error adding product:", error);
@@ -203,7 +210,7 @@ const AdminPage = () => {
 
         {/* EU MARKETPLACE PRICES */}
         <div className="grid grid-cols-2 gap-2">
-          {["nl", "de", "fr", "it", "es", "uk"].map((mkt) => (
+          {["nl", "de", "fr", "it", "es", "couk"].map((mkt) => (
             <input
               key={mkt}
               data-marketplace={mkt}
@@ -217,9 +224,9 @@ const AdminPage = () => {
 
         {/* AFFILIATE ID */}
         <input
-          name="affiliateId"
-          placeholder="Affiliate ID (EAN / ASIN)"
-          value={formData.affiliateId}
+          name="asin"
+          placeholder="ASIN"
+          value={formData.asin}
           onChange={handleChange}
           className="border p-2 rounded w-full"
         />

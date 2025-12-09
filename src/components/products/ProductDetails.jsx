@@ -9,6 +9,7 @@ import { Heart } from "lucide-react";
 import toast from "react-hot-toast";
 import { useUserCountry } from "../../hooks/useUserCountry";
 
+
 const ProductDetails = () =>{
     const { id } = useParams();
     const [product, setProduct] = useState(null);
@@ -25,6 +26,20 @@ const ProductDetails = () =>{
         case "GBP": return "£";
         default: return "€";
         }
+    }
+
+    const formatTimeStamp = (ts) => {
+        if (!ts) return "Not updated yet";
+
+        const date = ts.toDate();
+
+        return date.toLocaleString("en-GB",{
+            day: "2-digit",
+            month: "short",
+            year: "numeric",
+            hour: "2-digit",
+            minute: "2-digit"
+        })
     }
 
     const toggleWishlist = async (productId) => {
@@ -99,6 +114,8 @@ const ProductDetails = () =>{
         );
     }
     const displayPrice = product.prices?.[marketplace] ?? product.prices?.de ?? null;
+
+    const displayPriceLastUpdated = product.pricesLastUpdated?.[marketplace] ?? null;
     
     const priceSymbol = getCurrencySymbol(currency);
 
@@ -143,7 +160,9 @@ const ProductDetails = () =>{
             <h1 className="text-3xl font-bold text-gray-800 mb-4">
             {product.name}
             </h1>
-
+            <p className="text-sm font-semibold mb-2">
+                {loadingCountry ? "loading...." : displayPriceLastUpdated ? `Last updated: ${formatTimeStamp(displayPriceLastUpdated)}` : "No update available"}
+            </p>
             <p className="text-xl font-semibold text-[#44A77D] mb-2">
                {loadingCountry ? "loading...." : displayPrice ? `${priceSymbol}${displayPrice?.toFixed(2)}`: "Price unavailable"}
             </p>

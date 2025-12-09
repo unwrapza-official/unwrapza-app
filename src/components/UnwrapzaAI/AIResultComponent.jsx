@@ -33,7 +33,7 @@ const AIResultComponent = ({results, isSearching, setShowResults}) => {
                 {!isSearching && (
                 <button
                     onClick={() => setShowResults(false)}
-                    className="md:hidden px-4 py-2 bg-white text-green font-bold 
+                    className="md:hidden px-2 py-1 bg-white text-green font-bold 
                             rounded-lg shadow-[4px_4px_0_#ffffff] border-2 border-white
                             active:scale-95 transition-all"
                 >
@@ -43,7 +43,6 @@ const AIResultComponent = ({results, isSearching, setShowResults}) => {
             </div>
 
             {isSearching && <SearchingAnimation/>}
-
 
             {!isSearching && products.length === 0 && (
                 <AISkeletonCard/>
