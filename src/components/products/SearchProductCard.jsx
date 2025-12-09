@@ -105,7 +105,7 @@ const SearchProductCard = ({ product }) => {
         "
       >
         <img
-          src={product.image}
+          src={product.images?.[0]}
           alt={product.name}
           className="
             w-5/6 h-5/6 object-contain 

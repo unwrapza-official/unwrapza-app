@@ -4,7 +4,7 @@ const Disclaimer = () => {
       <h1 className="text-3xl font-bold mb-6">Affiliate Disclaimer</h1>
 
       <p className="mb-4">
-        Last updated: <em>[fill in date]</em>
+        Last updated: <em>[3-12-2025]</em>
       </p>
 
       <p className="mb-4">

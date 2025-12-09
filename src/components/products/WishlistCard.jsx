@@ -49,7 +49,7 @@ const WishlistCard = ({product}) => {
         {/* Image container */}
         <div className="w-full aspect-square bg-[#F5FAF7] rounded-xl flex items-center justify-center overflow-hidden">
         <img
-            src={product.image}
+            src={product.images?.[0]}
             className="w-3/4 h-3/4 object-contain transition-transform group-hover:scale-105 duration-300"
         />
         </div>

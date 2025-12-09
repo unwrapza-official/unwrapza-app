@@ -31,13 +31,13 @@ const Header = () => {
     }
 
     const categories = [
-        { name: "For Her", path: "/for-her", image: for_her },
-        { name: "For Him", path: "/for-him", image: for_him },
-        { name: "Tech Gifts", path: "/tech", image: tech_gifts },
-        { name: "Home & Living", path: "/home_living", image: home_living },
-        { name: "Funny Gifts", path: "/funny", image: funny_gifts },
-        { name: "Luxury Picks", path: "/luxury", image: luxury_picks },
-        { name: "For Kids", path: "/kids", image: For_kids },
+        { name: "For Her", path: "/category/for-her", image: for_her, slug: "for-her",  },
+        { name: "For Him", path: "/category/for-him", image: for_him, slug: "for-him", },
+        { name: "Tech Gifts", path: "/category/tech", image: tech_gifts, slug: "tech", },
+        { name: "Home & Living", path: "/category/home_living", image: home_living, slug: "home_living", },
+        { name: "Funny Gifts", path: "/category/funny", image: funny_gifts, slug: "funny", },
+        { name: "Luxury Picks", path: "/category/luxury", image: luxury_picks, slug: "luxury", },
+        { name: "For Kids", path: "/category/kids", image: For_kids, slug: "kids", },
     ];
 
     useEffect(() => {
@@ -180,7 +180,7 @@ const Header = () => {
                     {/* Left side: Categories */}
                     <div 
                         className="relative group cursor-pointer h-full flex justify-center"
-                        onClick={() => setCategoriesMenuOpen(true)}
+                        onMouseEnter={() => setCategoriesMenuOpen(true)}
                         onMouseLeave={() => setCategoriesMenuOpen(false)}
                     >
                         <p className="font-semibold text-[18px] flex items-center gap-2">

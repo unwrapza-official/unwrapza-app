@@ -91,7 +91,7 @@ const ProductCard = ({ product }) => {
       {/* IMAGE SECTION */}
       <div className="relative w-full aspect-square overflow-hidden rounded-xl bg-[#F5FAF7] flex items-center justify-center">
         <img
-          src={product.image}
+          src={product.images?.[0]}
           alt={product.name}
           className="w-3/4 h-3/4 object-contain transition-transform duration-500 group-hover:scale-105"
         />

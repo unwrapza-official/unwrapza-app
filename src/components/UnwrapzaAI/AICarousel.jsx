@@ -82,7 +82,7 @@ const AICarousel = ({ products }) => {
       >
         <div className="relative w-full h-44 rounded-2xl overflow-hidden shadow-lg">
           <img
-            src={product.image}
+            src={product.images?.[0]}
             alt={product.name}
             className="w-full h-full object-contain transition-transform duration-500"
           />

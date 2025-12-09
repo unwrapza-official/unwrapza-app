@@ -11,7 +11,6 @@ const AdminPage = () => {
     asin: "",
     affiliateLink: "",
     platform: "Amazon",
-    image: "",
     images: "",
     tags: "",
     isFeatured: false,
@@ -29,9 +28,6 @@ const AdminPage = () => {
 
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState(false);
-
-  const mainImagePreview =
-    formData.image?.trim().length > 5 ? formData.image : null;
 
   // Handle input change (supports nested prices)
   const handleChange = (e) => {
@@ -61,7 +57,7 @@ const AdminPage = () => {
   const validate = () => {
     if (!formData.name.trim()) return "Name is required.";
     if (!formData.description.trim()) return "Description is required.";
-    if (!formData.image.trim()) return "Main image URL is required.";
+    if (!formData.images.trim()) return "At least one image is required.";
     if (!formData.affiliateLink.trim()) return "Affiliate link is required.";
 
     // Validate the 6 EU prices
@@ -109,7 +105,6 @@ const AdminPage = () => {
         asin: formData.asin.trim(),
         affiliateLink: formData.affiliateLink.trim(),
         platform: formData.platform,
-        image: formData.image.trim(),
         images: formData.images
           .split(",")
           .map((url) => url.trim())
@@ -152,7 +147,6 @@ const AdminPage = () => {
         asin: "",
         affiliateLink: "",
         platform: "Amazon",
-        image: "",
         images: "",
         tags: "",
         isFeatured: false,
@@ -199,13 +193,13 @@ const AdminPage = () => {
           onChange={handleChange}
           className="border p-2 rounded w-full"
         >
-          <option>For Her</option>
-          <option>For Him</option>
-          <option>Tech Gifts</option>
-          <option>Home & Living</option>
-          <option>Funny Gifts</option>
-          <option>Luxury Picks</option>
-          <option>For Kids</option>
+          <option>for-her</option>
+          <option>for-him</option>
+          <option>tech</option>
+          <option>home_living</option>
+          <option>funny</option>
+          <option>luxury</option>
+          <option>kids</option>
         </select>
 
         {/* EU MARKETPLACE PRICES */}
@@ -250,23 +244,6 @@ const AdminPage = () => {
           <option>Amazon</option>
         </select>
 
-        {/* MAIN IMAGE */}
-        <input
-          name="image"
-          placeholder="Main image URL"
-          value={formData.image}
-          onChange={handleChange}
-          className="border p-2 rounded w-full"
-        />
-
-        {mainImagePreview && (
-          <img
-            src={mainImagePreview}
-            alt="preview"
-            className="w-32 h-32 object-contain mx-auto rounded-lg shadow-md mt-2"
-          />
-        )}
-
         {/* EXTRA IMAGES */}
         <input
           name="images"
@@ -275,6 +252,24 @@ const AdminPage = () => {
           onChange={handleChange}
           className="border p-2 rounded w-full"
         />
+        
+        {/* IMAGE PREVIEW GALLERY */}
+        {formData.images.trim().length > 0 && (
+          <div className="flex gap-3 overflow-x-auto mt-3 p-2 bg-gray-50 rounded-lg">
+            {formData.images
+              .split(",")
+              .map((url, i) => url.trim())
+              .filter((url) => url !== "")
+              .map((url, i) => (
+                <img
+                  key={i}
+                  src={url}
+                  alt={`preview-${i}`}
+                  className="w-20 h-20 object-contain rounded border shadow-sm flex-shrink-0"
+                />
+              ))}
+          </div>
+        )}
 
         {/* TAGS */}
         <input
