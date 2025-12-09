@@ -42,10 +42,7 @@ const RedirectPage = () => {
 
       const finalUrl = `https://${domain}/dp/${asin}?tag=${tag}`;
 
-      // App-safe redirect
-      setTimeout(() => {
-        window.location.assign(finalUrl);
-      }, 1000);
+      window.location.href = finalUrl;
     };
 
     redirectNow();
