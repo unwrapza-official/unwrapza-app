@@ -34,7 +34,7 @@ const RedirectPage = () => {
 
     const redirectNow = () => {
 
-      // Juiste Amazon domein
+      // Juiste Amazon domain
       const domain = DOMAIN_MAP[marketplace] || DOMAIN_MAP["de"];
 
       // Juiste affiliate tag
