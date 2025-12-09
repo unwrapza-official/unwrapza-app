@@ -7,6 +7,7 @@ import { setDoc, deleteDoc, getDocs } from "firebase/firestore";
 import { Heart } from "lucide-react";
 import toast from "react-hot-toast";
 import { useUserCountry } from "../../hooks/useUserCountry";
+import { AllowedMarketPlaces } from "../../config/AllowedMarketplaces";
 
 const SearchProductCard = ({ product }) => {
   const [wishlistIds, setWishlistIds] = useState([]);
@@ -14,6 +15,7 @@ const SearchProductCard = ({ product }) => {
   const navigate = useNavigate(); 
   
   const {marketplace, currency, loadingCountry} = useUserCountry();
+  const canShowPrice = AllowedMarketPlaces.includes(marketplace);
 
   const getCurrencySymbol = (currency) => {
     switch(currency){
@@ -165,7 +167,7 @@ const SearchProductCard = ({ product }) => {
         >
           {/* PRICE */}
           <h2 className="text-lg sm:text-xl font-bold text-[#44A77D]">
-            {loadingCountry ? "loading...." : displayPrice !== null ? `${priceSymbol}${displayPrice?.toFixed(2)}` : "Price unavailable"}
+            { !canShowPrice ? "" : loadingCountry ? "loading...." : displayPrice !== null ? `${priceSymbol}${displayPrice?.toFixed(2)}` : "Price unavailable"}
           </h2>
 
           {/* BUTTONS */}

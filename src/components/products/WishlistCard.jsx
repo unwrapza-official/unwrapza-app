@@ -4,11 +4,14 @@ import { auth, db } from "../../firebase"
 import { deleteDoc, doc } from "firebase/firestore";
 import toast from "react-hot-toast";
 import { useUserCountry } from "../../hooks/useUserCountry";
+import { AllowedMarketPlaces } from "../../config/AllowedMarketplaces";
 
 const WishlistCard = ({product}) => {
     const navigate = useNavigate();
 
     const {marketplace, currency, loadingCountry} = useUserCountry();
+
+    const canShowPrice = AllowedMarketPlaces.includes(marketplace);
     
     const getCurrencySymbol = (currency) => {
        switch(currency){
@@ -57,7 +60,7 @@ const WishlistCard = ({product}) => {
         </h3>
 
         <p className="text-[#44A77D] font-bold mt-1 text-base">
-        {loadingCountry ? "loading...." : displayPrice !== null ? `${priceSymbol}${displayPrice?.toFixed(2)}` : "Price unavailable"}
+        { !canShowPrice ? "" : loadingCountry ? "loading...." : displayPrice !== null ? `${priceSymbol}${displayPrice?.toFixed(2)}` : "Price unavailable"}
         </p>
 
         {/* CTA button */}

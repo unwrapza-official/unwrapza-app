@@ -4,12 +4,15 @@ import { useNavigate } from "react-router-dom";
 import { addDoc, updateDoc, doc, increment, collection } from "firebase/firestore";
 import { db } from "../../firebase";
 import { useUserCountry } from "../../hooks/useUserCountry";
+import { AllowedMarketPlaces } from "../../config/AllowedMarketplaces";
 
 const AICarousel = ({ products }) => {
   const [index, setIndex] = useState(1); // start in 't midden
 
   const navigate = useNavigate();
   const { marketplace, currency, loadingCountry } = useUserCountry();
+
+  const canShowPrice = AllowedMarketPlaces.includes(marketplace);
 
   const getCurrencySymbol = (currency) => {
     switch (currency) {
@@ -96,11 +99,13 @@ const AICarousel = ({ products }) => {
         </p>
 
         <p className="text-[#44A77D] font-semibold text-xl mt-3">
-          {loadingCountry
-            ? "Loading..."
-            : displayPrice !== null
-              ? `${priceSymbol}${displayPrice.toFixed(2)}`
-              : "Price unavailable"}
+          {!canShowPrice
+            ? ""
+            : loadingCountry
+              ? "Loading..."
+              : displayPrice !== null
+                ? `${priceSymbol}${displayPrice.toFixed(2)}`
+                : "Price unavailable"}
         </p>
 
         <button

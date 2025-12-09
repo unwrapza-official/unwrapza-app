@@ -8,6 +8,7 @@ import { collection, getDoc } from "firebase/firestore";
 import { Heart } from "lucide-react";
 import toast from "react-hot-toast";
 import { useUserCountry } from "../../hooks/useUserCountry";
+import { AllowedMarketPlaces } from "../../config/AllowedMarketplaces";
 
 
 const ProductDetails = () =>{
@@ -19,6 +20,8 @@ const ProductDetails = () =>{
     const [wishlistIds, setWishlistIds] = useState([]);
 
     const {marketplace, currency, loadingCountry} = useUserCountry();
+
+    const canShowPrice = AllowedMarketPlaces.includes(marketplace);
     
     const getCurrencySymbol = (currency) => {
         switch(currency){
@@ -161,10 +164,10 @@ const ProductDetails = () =>{
             {product.name}
             </h1>
             <p className="text-sm font-semibold mb-2">
-                {loadingCountry ? "loading...." : displayPriceLastUpdated ? `Last updated: ${formatTimeStamp(displayPriceLastUpdated)}` : "No update available"}
+                {!canShowPrice ? "" : loadingCountry ? "loading...." : displayPriceLastUpdated ? `Last updated: ${formatTimeStamp(displayPriceLastUpdated)}` : "No update available"}
             </p>
             <p className="text-xl font-semibold text-[#44A77D] mb-2">
-               {loadingCountry ? "loading...." : displayPrice ? `${priceSymbol}${displayPrice?.toFixed(2)}`: "Price unavailable"}
+               {!canShowPrice ? "" : loadingCountry ? "loading...." : displayPrice ? `${priceSymbol}${displayPrice?.toFixed(2)}`: "Price unavailable"}
             </p>
 
             <p className="text-sm text-gray-500 mb-6">
