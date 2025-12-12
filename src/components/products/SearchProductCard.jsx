@@ -7,7 +7,7 @@ import { setDoc, deleteDoc, getDocs } from "firebase/firestore";
 import { Heart } from "lucide-react";
 import toast from "react-hot-toast";
 import { useUserCountry } from "../../hooks/useUserCountry";
-import { AllowedMarketPlaces } from "../../config/AllowedMarketplaces";
+import { supabase } from "../../supabaseClient";
 
 const SearchProductCard = ({ product }) => {
   const [wishlistIds, setWishlistIds] = useState([]);
@@ -15,7 +15,6 @@ const SearchProductCard = ({ product }) => {
   const navigate = useNavigate(); 
   
   const {marketplace, currency, loadingCountry} = useUserCountry();
-  const canShowPrice = AllowedMarketPlaces.includes(marketplace);
 
   const getCurrencySymbol = (currency) => {
     switch(currency){
@@ -25,7 +24,7 @@ const SearchProductCard = ({ product }) => {
     }
   }
 
-  const displayPrice = product.prices?.[marketplace] ?? product.prices?.de ?? null;
+  const displayPrice = product.price ?? null;
 
   const priceSymbol = getCurrencySymbol(currency);
 
@@ -66,18 +65,17 @@ const SearchProductCard = ({ product }) => {
   const handleClick = async () => {
     try {
       await addDoc(collection(db, "clicks"), {
-        productId: product.id,
+        productId: product.product_id,
         timeStamp: new Date(),
         platform: product.platform,
       });
-      const productRef = doc(db, "products", product.id); 
-      await updateDoc(productRef, {
-        clickCount: increment(1),  
-      })
+      
+      await supabase.from("products").update({ click_count: (product.click_count ?? 0) + 1 }).eq("id", product.product_id);
 
-      navigate(`/product/${product.id}`);
     } catch (error) {
       console.error("Error tracking click:", error);
+    } finally {
+      navigate(`/product/${product.product_id}`);
     }
   };
 
@@ -106,7 +104,7 @@ const SearchProductCard = ({ product }) => {
       >
         <img
           src={product.images?.[0]}
-          alt={product.name}
+          alt={product.product_name}
           className="
             w-5/6 h-5/6 object-contain 
             group-hover:scale-105 transition-transform duration-300
@@ -138,7 +136,7 @@ const SearchProductCard = ({ product }) => {
               overflow: "hidden"
             }}
           >
-            {product.name}
+            {product.product_name}
           </h3>
 
           {/* DESCRIPTION — force 2-line clamp ALWAYS */}
@@ -167,7 +165,7 @@ const SearchProductCard = ({ product }) => {
         >
           {/* PRICE */}
           <h2 className="text-lg sm:text-xl font-bold text-[#44A77D]">
-            { !canShowPrice ? "" : loadingCountry ? "loading...." : displayPrice !== null ? `${priceSymbol}${displayPrice?.toFixed(2)}` : "Price unavailable"}
+            {loadingCountry ? "loading...." : displayPrice !== null ? `${priceSymbol}${displayPrice?.toFixed(2)}` : "Price unavailable"}
           </h2>
 
           {/* BUTTONS */}
@@ -177,15 +175,15 @@ const SearchProductCard = ({ product }) => {
             <button
               className="
                 p-1.5 sm:p-2 rounded-full border border-gray-300 
-                hover:bg-gray-100 transition shadow-sm
+                hover:bg-gray-100 transition shadow-sm hover:cursor-pointer
               "
               onClick={(e) => {
                 e.stopPropagation()
-                toggleWishlist(product.id)
+                toggleWishlist(product.product_id)
                }
               }
             >
-              <Heart className={`w-4 h-4 sm:w-5 sm:h-5 ${wishlistIds.includes(product.id) ? "text-red-500 fill-red-500" : "text-gray-500"}`} />
+              <Heart className={`w-4 h-4 sm:w-5 sm:h-5 ${wishlistIds.includes(product.product_id) ? "text-red-500 fill-red-500" : "text-gray-500"}`} />
             </button>
 
             {/* VIEW BUTTON */}

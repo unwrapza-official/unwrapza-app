@@ -1,5 +1,4 @@
 import UnwrapzaAI from '../components/UnwrapzaAI/UnwrapzaAI';
-import AllProducts from '../components/products/AllProducts';
 import TrendingProducts from '../components/products/TrendingProducts'
 
 const HomePage = () => {
@@ -8,7 +7,6 @@ const HomePage = () => {
         <div>
             <UnwrapzaAI/>
             <TrendingProducts/>
-            <AllProducts/>
         </div>
     )
 }

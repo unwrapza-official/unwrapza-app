@@ -4,14 +4,11 @@ import { auth, db } from "../../firebase"
 import { deleteDoc, doc } from "firebase/firestore";
 import toast from "react-hot-toast";
 import { useUserCountry } from "../../hooks/useUserCountry";
-import { AllowedMarketPlaces } from "../../config/AllowedMarketplaces";
 
-const WishlistCard = ({product}) => {
+const WishlistCard = ({product, onRemoved}) => {
     const navigate = useNavigate();
 
     const {marketplace, currency, loadingCountry} = useUserCountry();
-
-    const canShowPrice = AllowedMarketPlaces.includes(marketplace);
     
     const getCurrencySymbol = (currency) => {
        switch(currency){
@@ -21,7 +18,7 @@ const WishlistCard = ({product}) => {
       }
     }
     
-    const displayPrice = product.prices?.[marketplace] ?? product.prices?.de ?? null;
+    const displayPrice = product.price ?? null;
     
     const priceSymbol = getCurrencySymbol(currency);
 
@@ -29,9 +26,13 @@ const WishlistCard = ({product}) => {
         const user = auth.currentUser;
         if(!user) return toast.error("Log in to manage your wishlist!");
 
-        const itemRef = doc(db, "users", user.uid, "wishlist", product.id);
+        const itemRef = doc(db, "users", user.uid, "wishlist", product.product_id);
         await deleteDoc(itemRef);
-        window.location.reload();
+        
+        toast.success("Removed from wishlist");
+        onRemoved(product.product_id);
+
+
     }
     
     return (
@@ -56,16 +57,16 @@ const WishlistCard = ({product}) => {
 
         {/* Info */}
         <h3 className="mt-4 text-gray-900 font-semibold text-sm line-clamp-2">
-        {product.name}
+        {product.product_name}
         </h3>
 
         <p className="text-[#44A77D] font-bold mt-1 text-base">
-        { !canShowPrice ? "" : loadingCountry ? "loading...." : displayPrice !== null ? `${priceSymbol}${displayPrice?.toFixed(2)}` : "Price unavailable"}
+        {loadingCountry ? "loading...." : displayPrice !== null ? `${priceSymbol}${displayPrice?.toFixed(2)}` : "Price unavailable"}
         </p>
 
         {/* CTA button */}
         <button
-        onClick={() => navigate(`/product/${product.id}`)}
+        onClick={() => navigate(`/product/${product.product_id}`)}
         className="
             mt-4 bg-[#44A77D] hover:bg-[#3a8d6c] 
             text-white w-full py-2 

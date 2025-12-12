@@ -4,15 +4,12 @@ import { useNavigate } from "react-router-dom";
 import { addDoc, updateDoc, doc, increment, collection } from "firebase/firestore";
 import { db } from "../../firebase";
 import { useUserCountry } from "../../hooks/useUserCountry";
-import { AllowedMarketPlaces } from "../../config/AllowedMarketplaces";
 
 const AICarousel = ({ products }) => {
   const [index, setIndex] = useState(1); // start in 't midden
 
   const navigate = useNavigate();
   const { marketplace, currency, loadingCountry } = useUserCountry();
-
-  const canShowPrice = AllowedMarketPlaces.includes(marketplace);
 
   const getCurrencySymbol = (currency) => {
     switch (currency) {
@@ -51,16 +48,16 @@ const AICarousel = ({ products }) => {
     const handleClick = async () => {
       try {
         await addDoc(collection(db, "clicks"), {
-          productId: product.id,
+          productId: product.product_id,
           timeStamp: new Date(),
           platform: product.platform,
         });
 
-        await updateDoc(doc(db, "products", product.id), {
+        await updateDoc(doc(db, "products", product.product_id), {
           clickCount: increment(1),
         });
 
-        navigate(`/product/${product.id}`);
+        navigate(`/product/${product.product_id}`);
       } catch (error) {
         console.error("Error tracking click:", error);
       }
@@ -68,7 +65,7 @@ const AICarousel = ({ products }) => {
 
     return (
       <div
-        key={product.id}
+        key={product.product_id}
         className={`
           relative transition-all duration-500 ease-out
           rounded-3xl p-4 shadow-2xl border border-white/10 backdrop-blur-sm
@@ -83,7 +80,7 @@ const AICarousel = ({ products }) => {
         <div className="relative w-full h-44 rounded-2xl overflow-hidden shadow-lg">
           <img
             src={product.images?.[0]}
-            alt={product.name}
+            alt={product.product_name}
             className="w-full h-full object-contain transition-transform duration-500"
           />
         </div>
@@ -91,7 +88,7 @@ const AICarousel = ({ products }) => {
           {product.platform}
         </p>
         <h2 className="text-lg font-bold text-black line-clamp-2">
-          {product.name}
+          {product.product_name}
         </h2>
 
         <p className="text-black text-sm mt-1 line-clamp-3">

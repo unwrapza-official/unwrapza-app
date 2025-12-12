@@ -23,13 +23,11 @@ import CookiePolicy from './pages/legal/CookiePolicy'
 import CategoryPage from './pages/CategoryPage'
 import About from './pages/About'
 import {Toaster} from 'react-hot-toast';
-import RedirectPage from './pages/RedirectPage'
 
 function App() {
   const location = useLocation();
 
   const disableComponent = 
-    location.pathname.startsWith("/go/") ||
     location.pathname === "/login" ||
     location.pathname === "/admin";
   
@@ -93,7 +91,6 @@ function App() {
         <Route path="/admin" element={<AdminRoute><AdminPage /></AdminRoute>}/>
         <Route path ="/product/:id" element={<ProductDetails/>}/>
         <Route path="/search" element={<SearchResults />}/>
-        <Route path="/go/:asin" element={<RedirectPage/>}/>
         <Route path="/*" element={<NotFoundPage/>}/>
       </Routes>
       {!disableComponent && <Footer/>}

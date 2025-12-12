@@ -17,7 +17,7 @@ const MARKETPLACE_MAP = {
     HR: "de",   // Kroatië gebruikt EUR sinds 2023
 
     // NEW → Ierland gebruikt Amazon UK als primair
-    IE: "couk",   // Amazon.co.uk levert aan Ierland, grootste marketplace voor IE
+    IE: "uk",   // Amazon.co.uk levert aan Ierland, grootste marketplace voor IE
 
     // Microstates (optioneel, hebben EUR)
     MC: "fr",   // Monaco
@@ -39,8 +39,8 @@ const MARKETPLACE_MAP = {
     BG: "de",   // Bulgarije (BGN)
     MT: "it",   // Malta (EUR)
 
-    UK: "couk",   // Verenigd Koninkrijk (Amazon.co.uk)
-    GB: "couk",   // Sommige browsers gebruiken GB als landcode
+    UK: "uk",   // Verenigd Koninkrijk (Amazon.co.uk)
+    GB: "uk",   // Sommige browsers gebruiken GB als landcode
 
     // fallback fallback → als landcode onbekend is → Duitsland
     DEFAULT: "de",
@@ -48,6 +48,7 @@ const MARKETPLACE_MAP = {
 
 export function useUserCountry() {
     const [country, setCountry] = useState(null);
+    const [countryName, setCountryName] = useState("Germany")
     const [marketplace, setMarketplace] = useState("de");
     const [currency, setCurrency] = useState("EUR");
     const [loadingCountry, setLoadingCountry] = useState(true);
@@ -59,8 +60,10 @@ export function useUserCountry() {
                 const data = await response.json();
 
                 const userCountry = data.country_code || "DE";
-
+                const userCountryName = data.country || "Germany";
+ 
                 setCountry(userCountry);
+                setCountryName(userCountryName)
 
                 // Map EU country → marketplace
                 const mappedMarket = MARKETPLACE_MAP[userCountry] || MARKETPLACE_MAP.DEFAULT;
@@ -76,6 +79,7 @@ export function useUserCountry() {
             } catch (error) {
                 console.log("Location detection failed:", error);
                 setCountry("de");
+                setCountryName("Germany")
                 setMarketplace("de");
                 setCurrency("EUR");
             } finally {
@@ -85,5 +89,5 @@ export function useUserCountry() {
         fetchLocation();
     }, []);
 
-    return { country, currency, marketplace, loadingCountry };
+    return { country, currency, marketplace, loadingCountry, countryName };
 }

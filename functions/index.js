@@ -12,8 +12,6 @@ const admin = require("firebase-admin");
 const OpenAI = require("openai");
 
 const { defineSecret } = require("firebase-functions/params");
-const SCRAPER_API_KEY = defineSecret("SCRAPER_API_KEY");
-
 
 admin.initializeApp();
 const db = admin.firestore();
@@ -61,102 +59,6 @@ function cosineSimilarity(a, b) {
 
   return dot / (Math.sqrt(normA) * Math.sqrt(normB));
 }
-
-// Helper: prijs correct parsen in alle formaten
-function extractPrice(value) {
-  if (!value) return null;
-
-  const cleaned = value.replace(/[^\d.,]/g, "");
-  const normalized = cleaned.replace(",", ".");
-  const parsed = parseFloat(normalized);
-
-  return isNaN(parsed) ? null : parsed;
-}
-
-exports.updateAmazonPrices = onSchedule(
-  {
-    schedule: "48 2 9,15 * *", // draait om 04:00 op de 1e & 15e van elke maand
-    timeZone: "Europe/Amsterdam",
-    secrets: [SCRAPER_API_KEY],
-  },
-  async (event) => {
-    console.log("📦 Starting Amazon price update...");
-
-    const apiKey = SCRAPER_API_KEY.value();
-
-    const snapshot = await db.collection("products").get();
-    if (snapshot.empty) {
-      console.log("No products found!");
-      return null;
-    }
-
-    const products = snapshot.docs.map((doc) => ({
-      id: doc.id,
-      ...doc.data(),
-    }));
-
-    // Marketplace config
-    const marketplaces = [
-      { tld: "de", country: "de" },
-      { tld: "nl", country: "nl" },
-      { tld: "es", country: "es" },
-      { tld: "it", country: "it" },
-      { tld: "fr", country: "fr" },
-      { tld: "co.uk", country: "gb" },
-    ];
-
-    for (const product of products) {
-      if (!product.asin) {
-        console.log(`⚠ Product ${product.id} has no ASIN`);
-        continue;
-      }
-
-      for (const market of marketplaces) {
-        const url = `https://api.scraperapi.com/structured/amazon/product?api_key=${apiKey}&asin=${product.asin}&tld=${market.tld}&country=${market.country}`;
-
-        try {
-          const response = await fetch(url);
-          const data = await response.json();
-
-          if (!data) {
-            console.log(`❌ No data for ${product.id} (${market.tld})`);
-            continue;
-          }
-
-          // Extract price safely
-          const rawPrice =
-            data?.pricing?.amount ||
-            data?.pricing ||
-            data?.list_price ||
-            null;
-
-          const price = extractPrice(rawPrice);
-
-          if (!price) {
-            console.log(
-              `❌ Invalid or missing price for ${product.id} (${market.tld}). Raw:`,
-              rawPrice
-            );
-            continue;
-          }
-
-          console.log(`💰 ${product.id} @ ${market.tld} → ${price}`);
-
-          // Firestore update
-          await db.collection("products").doc(product.id).update({
-            [`prices.${market.tld.replace(".", "")}`]: price,
-            [`pricesLastUpdated.${market.tld.replace(".", "")}`]: admin.firestore.FieldValue.serverTimestamp(),
-          });
-        } catch (error) {
-          console.log(`❌ Error scraping ${product.id} (${market.tld}):`, error);
-        }
-      }
-    }
-
-    console.log("🎉 Price update completed!");
-    return null;
-  }
-);
 
 
 // =======================================================

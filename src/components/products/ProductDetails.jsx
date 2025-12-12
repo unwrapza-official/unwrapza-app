@@ -8,9 +8,8 @@ import { collection, getDoc } from "firebase/firestore";
 import { Heart } from "lucide-react";
 import toast from "react-hot-toast";
 import { useUserCountry } from "../../hooks/useUserCountry";
-import { AllowedMarketPlaces } from "../../config/AllowedMarketplaces";
 import { useRef } from "react";
-
+import { supabase } from "../../supabaseClient";
 
 const ProductDetails = () =>{
     const { id } = useParams();
@@ -35,8 +34,6 @@ const ProductDetails = () =>{
     };
 
     const {marketplace, currency, loadingCountry} = useUserCountry();
-
-    const canShowPrice = AllowedMarketPlaces.includes(marketplace);
     
     const getCurrencySymbol = (currency) => {
         switch(currency){
@@ -44,20 +41,6 @@ const ProductDetails = () =>{
         case "GBP": return "£";
         default: return "€";
         }
-    }
-
-    const formatTimeStamp = (ts) => {
-        if (!ts) return "Not updated yet";
-
-        const date = ts.toDate();
-
-        return date.toLocaleString("en-GB",{
-            day: "2-digit",
-            month: "short",
-            year: "numeric",
-            hour: "2-digit",
-            minute: "2-digit"
-        })
     }
 
     const toggleWishlist = async (productId) => {
@@ -94,24 +77,31 @@ const ProductDetails = () =>{
         loadWishlist();
     }, []);
 
-    useEffect(()  => {
-        const fetchProduct = async () => {
-            try{
-            const docRef = doc(db, "products", id)
-            const snap = await getDoc(docRef);
+    useEffect(() => {
+      const fetchProduct = async () => {
+        try {
+        const { data, error } = await supabase
+            .from("products")
+            .select("*")
+            .eq("product_id", id)
+            .single();
 
-            if(snap.exists()){
-                setProduct({ id: snap.id, ...snap.data() });
-            }
-            setLoading(false);
-            }
-            catch(error){
-                console.log("Error loading product:", error)
-                setLoading(false);
-            }
+        if (error) {
+            console.error("Error loading product:", error);
+        } else {
+            setProduct(data);
         }
-        fetchProduct();
+
+        } catch (err) {
+        console.error("Unexpected error:", err);
+        } finally {
+        setLoading(false);
+        }
+    };
+
+    fetchProduct();
     }, [id]);
+
     
     if (loading) {
 
@@ -131,9 +121,7 @@ const ProductDetails = () =>{
         </div>
         );
     }
-    const displayPrice = product.prices?.[marketplace] ?? product.prices?.de ?? null;
-
-    const displayPriceLastUpdated = product.pricesLastUpdated?.[marketplace] ?? null;
+    const displayPrice = product.price ??  null;
     
     const priceSymbol = getCurrencySymbol(currency);
 
@@ -157,22 +145,24 @@ const ProductDetails = () =>{
                     <button
                     onClick={(e) => {
                         e.stopPropagation();
-                        toggleWishlist(product.id)
+                        toggleWishlist(product.product_id)
                     }}
                     className="absolute top-4 right-4 bg-white/90 hover:bg-white shadow-md rounded-full p-2 transition"
                     >
-                    <Heart className={`w-6 h-6 transition ${wishlistIds.includes(product.id) ? "text-red-500 fill-red-500" : "text-gray-700 hover:text-red-500"}`} />
+                    <Heart className={`w-6 h-6 transition ${wishlistIds.includes(product.product_id) ? "text-red-500 fill-red-500" : "text-gray-700 hover:text-red-500"}`} />
                     </button>
 
                     {/* IMAGE */}
                     <img
                     src={product.images?.[activeImage]}
-                    alt={product.name}
+                    alt={product.product_name}
                     className="w-full h-full  object-contain"
                     />
                 </motion.div>
 
                 {/* IMAGE SELECTOR WRAPPED FOR DESKTOP BUTTONS */}
+
+                {product.images === 0 ? 
                 <div className="relative w-full mt-4">
 
                     {/* LEFT BUTTON (DESKTOP ONLY) */}
@@ -218,6 +208,7 @@ const ProductDetails = () =>{
                         ▶
                     </button>
                 </div>
+                : <></> }
             </div>
 
 
@@ -228,13 +219,10 @@ const ProductDetails = () =>{
             transition={{ duration: 0.5 }}
         >
             <h1 className="text-3xl font-bold text-gray-800 mb-4">
-            {product.name}
+            {product.product_name}
             </h1>
-            <p className="text-sm font-semibold mb-2">
-                {!canShowPrice ? "" : loadingCountry ? "loading...." : displayPriceLastUpdated ? `Last updated: ${formatTimeStamp(displayPriceLastUpdated)}` : "No update available"}
-            </p>
             <p className="text-xl font-semibold text-[#44A77D] mb-2">
-               {!canShowPrice ? `Check price on ${product.platform}` : loadingCountry ? "loading...." : displayPrice ? `${priceSymbol}${displayPrice?.toFixed(2)}`: "Price unavailable"}
+               {loadingCountry ? "loading...." : displayPrice ? `${priceSymbol}${displayPrice?.toFixed(2)}`: "Price unavailable"}
             </p>
 
             <p className="text-sm text-gray-500 mb-6">
@@ -242,7 +230,7 @@ const ProductDetails = () =>{
             </p>
 
             <button
-            onClick={() => window.open(`/go/${product.asin}`, "_blank")}
+            onClick={() => window.open(product.affiliate_url, "_blank")}
             className="w-full bg-[#44A77D] hover:bg-[#368866] transition text-white font-semibold py-3 rounded-lg mb-8"
             >
             Buy this product →

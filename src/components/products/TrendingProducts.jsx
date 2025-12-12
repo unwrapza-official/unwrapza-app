@@ -3,30 +3,32 @@ import { collection, getDocs, query, where } from "firebase/firestore";
 import { db } from "../../firebase";
 import ProductCard from "./ProductCard";
 import { ChevronLeft, ChevronRight } from "lucide-react";
+import { supabase } from "../../supabaseClient";
+import { useUserCountry } from "../../hooks/useUserCountry";
 
 const TrendingProducts = () => {
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
   const scrollContainer = useRef(null);
 
+
+  const {country} = useUserCountry();
+
   useEffect(() => {
+  if (!country) return;
+
   const fetchTrending = async () => {
     try {
-      // 🔥 Firestore query: haal alleen featured producten op
-      const q = query(
-        collection(db, "products"),
-        where("isFeatured", "==", true)
-      );
+      const { data, error } = await supabase
+        .from("products")
+        .select("*")
+        .eq("country", country)
+        .order("click_count", { ascending: false })
+        .limit(25);
 
-      const querySnapshot = await getDocs(q);
+      if (error) throw error;
 
-      const items = querySnapshot.docs.map(doc => ({
-        id: doc.id,
-        ...doc.data(),
-      }));
-
-      setProducts(items);
-
+      setProducts(data);
     } catch (error) {
       console.error("Error fetching trending products:", error);
     } finally {
@@ -35,7 +37,8 @@ const TrendingProducts = () => {
   };
 
   fetchTrending();
-}, []);
+}, [country]);
+
 
   const scroll = (direction) => {
     if (scrollContainer.current) {
@@ -50,7 +53,7 @@ const TrendingProducts = () => {
 
   return (
     <div className="w-full max-w-[1200px] mx-auto px-4 flex flex-col items-center">
-      <h1 className="text-[#44A77D] py-[30px] text-3xl md:text-5xl font-semibold">
+      <h1 className="text-black py-[30px] text-3xl md:text-5xl">
          Most Trending Gifts
       </h1>
 
@@ -80,7 +83,7 @@ const TrendingProducts = () => {
             className="flex overflow-x-auto overflow-y-hidden scroll-smooth gap-6 px-6 no-scrollbar"
           >
             {products.map((product) => (
-              <div key={product.id} className="flex-shrink-0 w-[220px] sm:w-[250px]">
+              <div key={product.product_id} className="flex-shrink-0 w-[220px] sm:w-[250px]">
                 <ProductCard product={product} />
               </div>
             ))}

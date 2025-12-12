@@ -6,8 +6,8 @@ import { db } from "../../firebase";
 import { Heart } from "lucide-react"; 
 import { useNavigate } from "react-router-dom";
 import toast from "react-hot-toast";
-import { useUserCountry } from "../../hooks/useUserCountry";
-import { AllowedMarketPlaces } from "../../config/AllowedMarketplaces";
+import { useUserCountry } from "../../hooks/useUserCountry"; 
+import { supabase } from "../../supabaseClient";
 
 const ProductCard = ({ product }) => {
 
@@ -15,8 +15,6 @@ const ProductCard = ({ product }) => {
   const [wishlistIds, setWishlistIds] = useState([]);
 
   const {marketplace, currency, loadingCountry} = useUserCountry();
-
-  const canShowPrice = AllowedMarketPlaces.includes(marketplace);
 
   const getCurrencySymbol = (currency) => {
     switch(currency){
@@ -26,7 +24,7 @@ const ProductCard = ({ product }) => {
     }
   }
 
-  const displayPrice = product.prices?.[marketplace] ?? product.prices?.de ?? null;
+  const displayPrice = product.price ?? null;
 
   const priceSymbol = getCurrencySymbol(currency);
 
@@ -40,11 +38,13 @@ const ProductCard = ({ product }) => {
 
     if (exists) {
       await deleteDoc(itemRef);
-      setWishlistIds(prev => prev.filter(id => id !== productId)); // UI direct updaten
+      setWishlistIds(prev => prev.filter(id => id !== productId));
+      toast.success("Removed from wishlist") // UI direct updaten
     } else {
       await setDoc(itemRef, {
         addedAt: new Date()
-      });
+      },
+       toast.success("Added to from wishlist"));
       setWishlistIds(prev => [...prev, productId]); // UI direct updaten
     }
   };
@@ -66,20 +66,24 @@ const ProductCard = ({ product }) => {
 
   const handleClick = async () => {
     try {
+      // 1. Kliklog naar Firestore (dit mag blijven)
       await addDoc(collection(db, "clicks"), {
-        productId: product.id,
+        productId: product.product_id,
         timeStamp: new Date(),
         platform: product.platform,
       });
-      const productRef = doc(db, "products", product.id);
-      
-      await updateDoc(productRef, {
-        clickCount: increment(1),
-      }) 
 
-      navigate(`/product/${product.id}`)
+      // 2. ClickCount verhogen in SUPABASE (niet meer in Firestore!)
+      await supabase
+        .from("products")
+        .update({ click_count: (product.click_count ?? 0) + 1 })
+        .eq("id", product.product_id);
+
     } catch (error) {
       console.error("Error tracking click:", error);
+    } finally {
+      // 3. Navigeren MOET ALTIJD doorgaan
+      navigate(`/product/${product.product_id}`);
     }
   };
 
@@ -92,7 +96,7 @@ const ProductCard = ({ product }) => {
       <div className="relative w-full aspect-square overflow-hidden rounded-xl bg-[#F5FAF7] flex items-center justify-center">
         <img
           src={product.images?.[0]}
-          alt={product.name}
+          alt={product.product_name}
           className="w-3/4 h-3/4 object-contain transition-transform duration-500 group-hover:scale-105"
         />
 
@@ -103,12 +107,12 @@ const ProductCard = ({ product }) => {
                      shadow-sm hover:bg-white transition"
           onClick={(e) => {
             e.stopPropagation();
-            toggleWishlist(product.id);
+            toggleWishlist(product.product_id);
           }}
         >
           <Heart
             className={`w-5 h-5 transition-all
-              ${wishlistIds.includes(product.id)
+              ${wishlistIds.includes(product.product_id)
                 ? "text-red-500 fill-red-500"
                 : "text-gray-600 hover:text-red-500"}`}
           />
@@ -119,16 +123,16 @@ const ProductCard = ({ product }) => {
       <div className="w-full flex flex-col text-start mt-4 relative">
         <p className="text-sm text-gray-400">{product.platform}</p>
         <h3 className="mt-1 font-bold text-sm text-gray-800 text-base leading-snug font-poppins whitespace-nowrap overflow-hidden">
-          {product.name}
+          {product.product_name}
         </h3>
         <h2 className="mt-2 font-bold text-[#44A77D] text-lg font-dmsans">
-          {!canShowPrice
-            ? ""
-            : loadingCountry
+          {
+            loadingCountry
             ? "loading...."
             : displayPrice !== null
             ? `${priceSymbol}${displayPrice?.toFixed(2)}`
-            : "Price unavailable"}
+            : "Price unavailable"
+          }
         </h2>
       </div>
     </div>
