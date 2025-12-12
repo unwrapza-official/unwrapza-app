@@ -53,7 +53,7 @@ const TrendingProducts = () => {
 
   return (
     <div className="w-full max-w-[1200px] mx-auto px-4 flex flex-col items-center">
-      <h1 className="text-black py-[30px] text-3xl md:text-5xl">
+      <h1 className="text-black py-[30px] text-2xl md:text-3xl font-semibold">
          Most Trending Gifts
       </h1>
 
@@ -83,7 +83,7 @@ const TrendingProducts = () => {
             className="flex overflow-x-auto overflow-y-hidden scroll-smooth gap-6 px-6 no-scrollbar"
           >
             {products.map((product) => (
-              <div key={product.product_id} className="flex-shrink-0 w-[220px] sm:w-[250px]">
+              <div key={product.product_id} className="flex-shrink-0 w-[130px] sm:w-[200px]">
                 <ProductCard product={product} />
               </div>
             ))}

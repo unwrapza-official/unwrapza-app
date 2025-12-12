@@ -122,7 +122,7 @@ const ProductDetails = () =>{
         );
     }
     const displayPrice = product.price ??  null;
-    
+    console.log(product.images);
     const priceSymbol = getCurrencySymbol(currency);
 
     return (
@@ -162,7 +162,7 @@ const ProductDetails = () =>{
 
                 {/* IMAGE SELECTOR WRAPPED FOR DESKTOP BUTTONS */}
 
-                {product.images === 0 ? 
+                {product.images.length !== 0 ? 
                 <div className="relative w-full mt-4">
 
                     {/* LEFT BUTTON (DESKTOP ONLY) */}

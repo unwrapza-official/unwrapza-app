@@ -94,7 +94,7 @@ const AISearchComponent = ({setResults, setIsSearching, setShowResults}) => {
     <div className=" h-full flex flex-col items-center md:items-start">
       {/* Search container */}
       <div className="w-9/10 h-full flex flex-col justify-evenly">
-        <h1 className="italic font-roboto font-bold text-white text-[26px]">
+        <h1 className="italic font-roboto font-bold text-white lg:text-xl">
           Let AI find 
           <span className="text-[#388dff]"> your </span> 
           perfect gift
@@ -104,12 +104,12 @@ const AISearchComponent = ({setResults, setIsSearching, setShowResults}) => {
         <form className="w-full max-w-2xl mx-auto py-2 grid grid-cols-2 gap-3 text-white text-lg font-roboto font-bold">
           
           {/* Who is it for? */}
-          <label className="flex flex-col">
-            For who is it?
+          <label className="flex flex-col text-base">
+            For whom
             <select
             value={relative}
             onChange={(e) => setRelative(e.target.value)}
-              className="mt-2 h-10 px-3 bg-green text-white font-semibold rounded-[6px] border-3
+              className="mt-2 h-9 px-3 bg-green text-white font-semibold rounded-[6px] border-3
                          shadow-[4px_4px_0_#FFFFFF] hover:shadow-[0_0_0_#FFFFFF]
                          hover:translate-x-[4px] hover:translate-y-[4px]
                          transition-all duration-300 ease-out focus:outline-none cursor-pointer"
@@ -125,8 +125,8 @@ const AISearchComponent = ({setResults, setIsSearching, setShowResults}) => {
           </label>
 
           {/* Age */}
-          <label className="flex flex-col">
-            How old is he/she?
+          <label className="flex flex-col text-base">
+            His/her age
             <input
               value={age}
               onChange={(e) => {
@@ -144,8 +144,8 @@ const AISearchComponent = ({setResults, setIsSearching, setShowResults}) => {
               min={0}
               max={110}
               type="number"
-              className="mt-2 h-10 px-3 bg-green text-white font-semibold rounded-[6px] border-3
-                         shadow-[4px_4px_0_#FFFFFF] hover:shadow-[0_0_0_#FFFFFF]
+              className="mt-2 h-9 px-3 bg-green text-white font-semibold rounded-[6px] border-3
+                         shadow-[4px_4px_0_#FFFFFF] hover:shadow-[0_0_0_#FFFFFF] text-base
                          hover:translate-x-[4px] hover:translate-y-[4px]
                          transition-all duration-300 ease-out focus:outline-none placeholder-white/70
                          [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
@@ -154,13 +154,13 @@ const AISearchComponent = ({setResults, setIsSearching, setShowResults}) => {
           </label>
 
           {/* Purpose */}
-          <label className="flex flex-col">
-            The purpose of this gift?
+          <label className="flex flex-col text-base">
+            Occasion
             <input
             value={purpose}
             onChange={(e) => setPurpose(e.target.value)}
               type="text"
-              className="mt-2 h-10 px-3 bg-green text-white font-semibold rounded-[6px] border-3
+              className="mt-2 h-9 px-3 bg-green text-white font-semibold rounded-[6px] border-3
                          shadow-[4px_4px_0_#FFFFFF] hover:shadow-[0_0_0_#FFFFFF]
                          hover:translate-x-[4px] hover:translate-y-[4px]
                          transition-all duration-300 ease-out focus:outline-none placeholder-white/70"
@@ -169,12 +169,12 @@ const AISearchComponent = ({setResults, setIsSearching, setShowResults}) => {
           </label>
 
           {/* Type */}
-          <label className="flex flex-col">
-            The type of this gift?
+          <label className="flex flex-col text-base">
+            Gift type
             <select
             value={type}
             onChange={(e) => setType(e.target.value)}
-              className="mt-2 h-10 px-3 bg-green text-white font-semibold rounded-[6px] border-3
+              className="mt-2 h-9 px-3 bg-green text-white font-semibold rounded-[6px] border-3
                          shadow-[4px_4px_0_#FFFFFF] hover:shadow-[0_0_0_#FFFFFF]
                          hover:translate-x-[4px] hover:translate-y-[4px]
                          transition-all duration-300 ease-out focus:outline-none cursor-pointer"
@@ -189,12 +189,12 @@ const AISearchComponent = ({setResults, setIsSearching, setShowResults}) => {
           </label>
 
           {/* Context */}
-          <label className="flex flex-col col-span-2">
-            More context about this gift?
+          <label className="flex flex-col col-span-2 text-base">
+            Extra details
             <textarea
             value={context}
             onChange={(e) => setContext(e.target.value)}
-              className="mt-2 p-3 bg-green text-white font-semibold rounded-[6px] border-3
+              className="mt-1 p-1 bg-green text-white font-semibold rounded-[6px] border-3
                          shadow-[4px_4px_0_#FFFFFF] hover:shadow-[0_0_0_#FFFFFF]
                          hover:translate-x-[4px] hover:translate-y-[4px]
                          overflow-hidden
@@ -204,15 +204,15 @@ const AISearchComponent = ({setResults, setIsSearching, setShowResults}) => {
           </label>
 
           {/* Price */}
-          <label className="flex flex-col col-span-2">
-            The price of this gift?
+          <label className="flex flex-col col-span-2 text-base">
+            Price range
             <div className="mt-2 flex gap-4">
               <input
                 type="number"
                 value={minPrice}
                 onChange={(e) => setMinPrice(e.target.value)}
                 onBlur={() => setMinPrice(formatPrice(minPrice))}
-                className="w-1/2 h-10 px-3 bg-green text-white font-semibold rounded-[6px] border-3
+                className="w-1/2 h-9 px-3 bg-green text-white font-semibold rounded-[6px] border-3
                            shadow-[4px_4px_0_#FFFFFF] hover:shadow-[0_0_0_#FFFFFF]
                            hover:translate-x-[4px] hover:translate-y-[4px]
                            transition-all duration-300 ease-out focus:outline-none placeholder-white/70
@@ -224,7 +224,7 @@ const AISearchComponent = ({setResults, setIsSearching, setShowResults}) => {
                 value={maxPrice}
                 onChange={(e) => setMaxPrice(e.target.value)}
                 onBlur={() => setMaxPrice(formatPrice(maxPrice))}
-                className="w-1/2 h-10 px-3 bg-green text-white font-semibold rounded-[6px] border-3
+                className="w-1/2 h-9 px-3 bg-green text-white font-semibold rounded-[6px] border-3
                            shadow-[4px_4px_0_#FFFFFF] hover:shadow-[0_0_0_#FFFFFF]
                            hover:translate-x-[4px] hover:translate-y-[4px]
                            transition-all duration-300 ease-out focus:outline-none placeholder-white/70

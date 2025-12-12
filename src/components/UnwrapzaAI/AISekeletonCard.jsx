@@ -4,7 +4,7 @@ const SkeletonBox = ({ className }) => (
 
 const AISkeletonCard = () => {
   return (
-    <div className="w-full flex flex-col md:flex-row items-center justify-center md:justify-end gap-4 py-6">
+    <div className="w-full flex flex-col md:flex-row items-center justify-center md:justify-end gap-4">
 
       {/* Left card */}
       <div className="w-full md:w-1/4 h-72 md:h-85 rounded-xl bg-neutral-900/30 p-4 flex flex-col gap-3 animate-pulse">

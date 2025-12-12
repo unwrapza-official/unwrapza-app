@@ -119,7 +119,7 @@ const AICarousel = ({ products }) => {
   };
 
   return (
-    <div className="w-full flex flex-col items-center py-4">
+    <div className="w-full flex flex-col items-center py-40">
       <div className="flex items-center justify-center gap-3">
         <button
           onClick={prev}

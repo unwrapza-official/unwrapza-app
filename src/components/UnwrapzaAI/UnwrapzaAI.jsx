@@ -28,10 +28,10 @@ const UnwrapzaAI = () => {
 
     return (
         <>
-            <div className='w-full h-[40px] bg-[#44A77D] flex justify-center'>
+            <div className='w-full bg-[#44A77D] flex justify-center'>
                 <div className='w-full max-w-[1200px] px-4 flex justify-end items-center'>
                     <button 
-                       className='className="col-span-2 h-[30px] px-3 bg-green border-3
+                       className='className="col-span-2 my-1 px-3 bg-green border-3 text-sm
                        text-white font-bold italic rounded-[6px]
                        shadow-[3px_3px_0_#FFFFFF] hover:shadow-[0_0_0_#FFFFFF]
                        hover:translate-x-[6px] hover:translate-y-[6px]
@@ -63,7 +63,7 @@ const UnwrapzaAI = () => {
                     transition={{ duration: 0.5 }}
                     className="w-full bg-[#60D8A5] flex justify-center"
                     >
-                    <div className="max-w-[1200px] w-full px-4 flex flex-col md:flex-row gap-6 py-6">
+                    <div className="max-w-[1200px] w-full px-4 flex flex-col md:flex-row gap-6 py-3 ">
 
                         {/* SEARCH COMPONENT */}
                         <div className={`${showResults ? "hidden md:block" : "block"} w-full md:w-1/3`}>

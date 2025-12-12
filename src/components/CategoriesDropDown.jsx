@@ -23,7 +23,7 @@ const CategoriesDropDown = ({ headerHeight, categories = [] }) => {
     <div
       className="fixed left-0 right-0 bg-white text-[#44A77D] shadow-md z-50 transition-all duration-300 ease-out"
       style={{
-        top: `${headerHeight - scrollY}px`,
+        top: `${headerHeight - scrollY - 1}px`,
         height: "500px",
       }}
     >
