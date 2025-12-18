@@ -62,6 +62,18 @@ const SearchProductCard = ({ product }) => {
     loadWishlist();
   }, []);
 
+  const addToRecentlyViewed = (productId) => {
+    const key = "recently_viewed";
+    const existing = JSON.parse(localStorage.getItem(key)) || [];
+
+    const updated = [
+      productId,
+      ...existing.filter((id) => id !== productId),
+    ].slice(0, 20); // max 20
+
+    localStorage.setItem(key, JSON.stringify(updated));
+  };
+
   const handleClick = async () => {
     try {
       await addDoc(collection(db, "clicks"), {
@@ -69,6 +81,8 @@ const SearchProductCard = ({ product }) => {
         timeStamp: new Date(),
         platform: product.platform,
       });
+
+      addToRecentlyViewed(product.product_id);
       
       await supabase.from("products").update({ click_count: (product.click_count ?? 0) + 1 }).eq("id", product.product_id);
 

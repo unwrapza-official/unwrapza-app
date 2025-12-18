@@ -94,7 +94,7 @@ const AISearchComponent = ({setResults, setIsSearching, setShowResults}) => {
     <div className=" h-full flex flex-col items-center md:items-start">
       {/* Search container */}
       <div className="w-9/10 h-full flex flex-col justify-evenly">
-        <h1 className="italic font-roboto font-bold text-white lg:text-xl">
+        <h1 className="italic font-roboto font-bold text-white text-lg lg:text-xl">
           Let AI find 
           <span className="text-[#388dff]"> your </span> 
           perfect gift

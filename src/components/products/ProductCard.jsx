@@ -64,6 +64,19 @@ const ProductCard = ({ product }) => {
     loadWishlist();
   }, []);
 
+  const addToRecentlyViewed = (productId) => {
+    const key = "recently_viewed";
+    const existing = JSON.parse(localStorage.getItem(key)) || [];
+
+    const updated = [
+      productId,
+      ...existing.filter((id) => id !== productId),
+    ].slice(0, 20); // max 20
+
+    localStorage.setItem(key, JSON.stringify(updated));
+  };
+
+
   const handleClick = async () => {
     try {
       // 1. Kliklog naar Firestore (dit mag blijven)
@@ -72,6 +85,8 @@ const ProductCard = ({ product }) => {
         timeStamp: new Date(),
         platform: product.platform,
       });
+
+      addToRecentlyViewed(product.product_id);
 
       // 2. ClickCount verhogen in SUPABASE (niet meer in Firestore!)
       await supabase
@@ -122,7 +137,7 @@ const ProductCard = ({ product }) => {
       {/* TEXT SECTION */}
       <div className="w-full flex flex-col text-start mt-4 relative">
         <p className="text-sm text-gray-400">{product.platform}</p>
-        <h3 className="mt-1 font-bold text-sm text-gray-800 text-base leading-snug font-poppins whitespace-nowrap overflow-hidden">
+        <h3 className="mt-1 font-bold text-gray-800 text-base leading-snug font-poppins line-clamp-2">
           {product.product_name}
         </h3>
         <h2 className="mt-2 font-bold text-[#44A77D] text-lg font-dmsans">
@@ -136,8 +151,7 @@ const ProductCard = ({ product }) => {
         </h2>
       </div>
     </div>
-);
-
+  );
 };
 
 export default ProductCard;

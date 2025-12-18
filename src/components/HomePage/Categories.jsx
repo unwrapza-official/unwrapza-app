@@ -46,7 +46,7 @@ const Categories = () => {
 
   return (
     <div className="w-full max-w-[1200px] mx-auto px-4">
-      <h1 className="text-black py-[30px] text-2xl md:text-3xl font-semibold flex w-full justify-center">
+      <h1 className="text-black py-[30px] text-2xl md:text-3xl font-semibold text-center">
         Shop by Category
       </h1>
 

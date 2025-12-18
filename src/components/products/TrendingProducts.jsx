@@ -1,6 +1,4 @@
 import { useEffect, useRef, useState } from "react";
-import { collection, getDocs, query, where } from "firebase/firestore";
-import { db } from "../../firebase";
 import ProductCard from "./ProductCard";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { supabase } from "../../supabaseClient";

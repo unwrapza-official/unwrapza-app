@@ -54,14 +54,14 @@ const BudgetRow = ({ title, minPrice, maxPrice, viewAllPath }) => {
       <div className="relative">
         <button
           onClick={() => scroll("left")}
-          className="absolute left-0 top-1/2 -translate-y-1/2 z-10 bg-white p-2 rounded-full shadow"
+          className="absolute left-0 top-1/2 -translate-y-1/2 z-10 bg-white/90 border border-gray-200 hover:bg-[#44A77D] hover:text-white p-2 rounded-full shadow-md transition"
         >
           <ChevronLeft size={18} />
         </button>
 
         <button
           onClick={() => scroll("right")}
-          className="absolute right-0 top-1/2 -translate-y-1/2 z-10 bg-white p-2 rounded-full shadow"
+          className="absolute right-0 top-1/2 -translate-y-1/2 z-10 bg-white p-2 rounded-full shadow -md border border-gray-200 hover:bg-[#44A77D] hover:text-white transition"
         >
           <ChevronRight size={18} />
         </button>
@@ -71,7 +71,7 @@ const BudgetRow = ({ title, minPrice, maxPrice, viewAllPath }) => {
           className="flex gap-4 overflow-x-auto scroll-smooth no-scrollbar px-8"
         >
           {products.map((p) => (
-            <div key={p.product_id ?? p.id} className="flex-shrink-0 w-[110px] sm:w-[170px]">
+            <div key={p.product_id ?? p.id} className="flex-shrink-0 w-[120px] sm:w-[150px] md:w-[180px]">
               <ProductCard product={p} />
             </div>
           ))}

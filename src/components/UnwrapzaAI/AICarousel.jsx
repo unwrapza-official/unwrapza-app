@@ -96,9 +96,7 @@ const AICarousel = ({ products }) => {
         </p>
 
         <p className="text-[#44A77D] font-semibold text-xl mt-3">
-          {!canShowPrice
-            ? ""
-            : loadingCountry
+          {loadingCountry
               ? "Loading..."
               : displayPrice !== null
                 ? `${priceSymbol}${displayPrice.toFixed(2)}`
@@ -119,7 +117,7 @@ const AICarousel = ({ products }) => {
   };
 
   return (
-    <div className="w-full flex flex-col items-center py-40">
+    <div className="w-full flex flex-col items-center">
       <div className="flex items-center justify-center gap-3">
         <button
           onClick={prev}
