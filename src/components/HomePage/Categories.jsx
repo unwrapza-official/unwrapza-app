@@ -2,13 +2,13 @@ import React, { useRef, useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 
-import for_her from "../../assets/categories/for_her.png";
-import for_him from "../../assets/categories/for_him.png";
-import tech_gifts from "../../assets/categories/tech_gifts.png";
-import home_living from "../../assets/categories/home_living.png";
-import funny_gifts from "../../assets/categories/funny_gifts.png";
-import luxury_picks from "../../assets/categories/luxury_picks.png";
-import For_kids from "../../assets/categories/for_kids.png";
+import for_her from "../../assets/categories/For_her.png";
+import for_him from "../../assets/categories/For_him.png";
+import tech_gifts from "../../assets/categories/Tech_gifts.png";
+import home_living from "../../assets/categories/Home_living.png";
+import funny_gifts from "../../assets/categories/Funny_gifts.png";
+import luxury_picks from "../../assets/categories/Luxury_picks.png";
+import For_kids from "../../assets/categories/For_kids.png";
 
 const Categories = () => {
   const categories = [
@@ -45,74 +45,62 @@ const Categories = () => {
   };
 
   return (
-    <div className="w-full max-w-[1200px] mx-auto px-4">
-      <h1 className="text-black py-[30px] text-2xl md:text-3xl font-semibold text-center">
-        Shop by Category
-      </h1>
-
-      {/* RELATIVE wrapper binnen 1200px */}
-      <div className="relative mb-20">
-        {/* LEFT BUTTON */}
+    <div className="w-full max-w-[1200px] mx-auto px-4 py-16">
+    {/* Header: Gecentreerd met accentlijn */}
+    <div className="flex flex-col items-center text-center mb-12">
+      <h2 className="text-2xl md:text-3xl font-extrabold text-gray-900 tracking-tight mb-4">
+        Explore <span className="text-[#44A77D]">Categories</span>
+      </h2>
+      <div className="h-1.5 w-16 bg-[#44A77D] rounded-full"></div>
+    </div>
+      <div className="relative">
+        {/* Pijltjes: Alleen zichtbaar als nodig, subtieler design */}
         {canScroll && (
-          <button
-            onClick={() => scroll("left")}
-            className="
-              absolute -left-4 top-1/2 -translate-y-1/2 z-10
-              bg-white rounded-full p-2 shadow-md
-              hover:bg-gray-100 transition
-            "
-          >
-            <ChevronLeft size={20} />
-          </button>
-        )}
-
-        {/* RIGHT BUTTON */}
-        {canScroll && (
-          <button
-            onClick={() => scroll("right")}
-            className="
-              absolute -right-4 top-1/2 -translate-y-1/2 z-10
-              bg-white rounded-full p-2 shadow-md
-              hover:bg-gray-100 transition
-            "
-          >
-            <ChevronRight size={20} />
-          </button>
+          <>
+            <button
+              onClick={() => scroll("left")}
+              className="absolute -left-2 top-[40%] -translate-y-1/2 z-20 bg-white/90 backdrop-blur shadow-lg rounded-full p-2 border border-gray-100 hover:bg-white transition-all active:scale-90 hidden md:block"
+            >
+              <ChevronLeft size={22} className="text-gray-700" />
+            </button>
+            <button
+              onClick={() => scroll("right")}
+              className="absolute -right-2 top-[40%] -translate-y-1/2 z-20 bg-white/90 backdrop-blur shadow-lg rounded-full p-2 border border-gray-100 hover:bg-white transition-all active:scale-90 hidden md:block"
+            >
+              <ChevronRight size={22} className="text-gray-700" />
+            </button>
+          </>
         )}
 
         {/* SCROLL AREA */}
         <div
           ref={scrollRef}
-          className="flex gap-4 overflow-x-auto scroll-smooth no-scrollbar px-1 py-1"
+          className="flex gap-5 overflow-x-auto scroll-smooth no-scrollbar pb-6 px-1"
         >
           {categories.map((cat, index) => (
             <Link
               key={index}
               to={cat.path}
-              className="
-                group flex-shrink-0
-                w-[130px] sm:w-[150px] md:w-[170px]
-                bg-white rounded-md
-                shadow-[0_1px_3px_rgba(0,0,0,0.06)]
-                hover:shadow-[0_4px_12px_rgba(0,0,0,0.10)]
-                transition-all duration-300
-                border-2 border-transparent
-                hover:scale-[1.03]
-                shadow-[0_1px_3px_rgba(0,0,0,0.06)]
-                hover:border-gray-300
-                hover:cursor-pointer
-              "
+              className="group flex-shrink-0 w-[140px] sm:w-[160px] md:w-[180px] bg-white transition-all duration-300"
             >
-              <div className="w-full rounded-t-md overflow-hidden bg-[#F4F5F4]">
+              {/* Image Box: Minimalistisch grijs vlak, zachtere hoeken */}
+              <div className="w-full aspect-square rounded-2xl overflow-hidden bg-[#F6F6F6] border border-gray-50 relative">
                 <img
                   src={cat.image}
                   alt={cat.name}
-                  className="w-full object-cover"
+                  className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
                 />
+                {/* Hele lichte border overlay op hover */}
+                <div className="absolute inset-0 border-0 group-hover:border-[3px] border-[#44A77D]/20 transition-all duration-300 rounded-2xl" />
               </div>
-              <span className="block my-2 text-sm font-semibold text-gray-800 text-center">
+
+              {/* Tekst: Iets strakker en dichter op de afbeelding */}
+              <span className="block mt-4 text-[15px] font-bold text-gray-800 text-center transition-colors group-hover:text-[#44A77D]">
                 {cat.name}
               </span>
+              
+              {/* Subtiel lijntje dat gecentreerd onder de tekst groeit */}
+              <div className="mx-auto w-0 h-[2px] bg-[#44A77D] transition-all duration-300 group-hover:w-8 mt-1 rounded-full" />
             </Link>
           ))}
         </div>

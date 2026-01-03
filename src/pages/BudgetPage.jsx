@@ -1,30 +1,27 @@
-import { useParams } from "react-router-dom";
+import { useSearchParams } from "react-router-dom";
 import { useEffect, useState } from "react";
-import CategoryProductCard from "../components/products/CategoryProductCard";
+import BudgetProductCard from "../components/products/BudgetProductCard";
 import { Loader2 } from "lucide-react";
 
 const PAGE_SIZE = 20;
-const categories = [
-  { name: "For Her", path: "/category/for-her",  slug: "for-her",  },
-  { name: "For Him", path: "/category/for-him",  slug: "for-him", },
-  { name: "Tech Gifts", path: "/category/tech",  slug: "tech", },
-  { name: "Home & Living", path: "/category/home_living",  slug: "home_living", },
-  { name: "Funny Gifts", path: "/category/funny",  slug: "funny", },
-  { name: "Luxury Picks", path: "/category/luxury",  slug: "luxury", },
-  { name: "For Kids", path: "/category/kids",  slug: "kids", },
-];
 
+const BudgetPage = () => {
+  const [params] = useSearchParams();
+  const min = params.get("min");
+  const max = params.get("max");
 
-const CategoryPage = () => {
-  const { slug } = useParams();
   const [products, setProducts] = useState([]);
   const [page, setPage] = useState(0);
   const [loading, setLoading] = useState(false);
   const [loadingMore, setLoadingMore] = useState(false);
   const [hasMore, setHasMore] = useState(true);
-  const [slugName, setSlugName] = useState("");
 
   const BASE_API = import.meta.env.DEV ? "http://localhost:3000" : "";
+
+  const title = max
+    ? `Gifts €${min} – €${max}`
+    : `Gifts from €${min}`;
+
   useEffect(() => {
     const loadInitialProducts = async () => {
       setLoading(true);
@@ -33,18 +30,25 @@ const CategoryPage = () => {
       setHasMore(true);
 
       try {
-        const res = await fetch(
-          `${BASE_API}/api/products?type=category&category=${slug}&page=0&limit=${PAGE_SIZE}`
-        );
-        if (!res.ok) throw new Error("Category load failed");
+        const query = new URLSearchParams({
+          type: "budget",
+          min,
+          page: 0,
+          limit: PAGE_SIZE,
+        });
+
+        if (max) query.append("max", max);
+
+        const res = await fetch(`${BASE_API}/api/products?${query}`);
+        if (!res.ok) throw new Error("Budget load failed");
+
         const json = await res.json();
         const data = json.products || [];
+
         setProducts(data);
         setHasMore(data.length === PAGE_SIZE);
-        setSlugName(categories.find(category => category.slug === slug)?.name || "" )
-
       } catch (err) {
-        console.error("Category fetch error:", err);
+        console.error("Budget fetch error:", err);
         setHasMore(false);
       } finally {
         setLoading(false);
@@ -52,23 +56,33 @@ const CategoryPage = () => {
     };
 
     loadInitialProducts();
-  }, [slug]);
+  }, [min, max]);
 
   const loadMore = async () => {
     if (loadingMore) return;
     setLoadingMore(true);
+
     const nextPage = page + 1;
 
     try {
-      const res = await fetch(
-        `${BASE_API}/api/products?type=category&category=${slug}&page=${nextPage}&limit=${PAGE_SIZE}`
-      );
+      const query = new URLSearchParams({
+        type: "budget",
+        min,
+        page: nextPage,
+        limit: PAGE_SIZE,
+      });
+
+      if (max) query.append("max", max);
+
+      const res = await fetch(`${BASE_API}/api/products?${query}`);
       if (!res.ok) throw new Error("Load more failed");
+
       const json = await res.json();
       const data = json.products || [];
 
-      setProducts(prev => [...prev, ...data]);
+      setProducts((prev) => [...prev, ...data]);
       setPage(nextPage);
+
       if (data.length < PAGE_SIZE) setHasMore(false);
     } catch (err) {
       console.error("Load more error:", err);
@@ -79,11 +93,10 @@ const CategoryPage = () => {
 
   return (
     <div className="max-w-[1200px] mx-auto px-4 py-20">
-      
       {/* HEADER */}
       <header className="mb-14 text-center">
-        <h1 className="text-3xl md:text-4xl font-black text-gray-900 capitalize mb-4">
-          {slugName || slug.replace(/-/g, " ")}
+        <h1 className="text-3xl md:text-4xl font-black text-gray-900 mb-4">
+          {title}
         </h1>
         <div className="w-20 h-1.5 bg-[#44A77D] mx-auto rounded-full" />
       </header>
@@ -101,10 +114,10 @@ const CategoryPage = () => {
         </div>
       ) : (
         <>
-          {/* GRID – compacter & meer producten per viewport */}
+          {/* GRID */}
           <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-3 xl:grid-cols-4 gap-x-5 gap-y-10">
-            {products.map(product => (
-              <CategoryProductCard
+            {products.map((product) => (
+              <BudgetProductCard
                 key={product.product_id}
                 product={product}
               />
@@ -118,9 +131,9 @@ const CategoryPage = () => {
                 disabled={loadingMore}
                 className="
                   px-10 py-4 rounded-xl font-bold text-white
-                  bg-[#44A77D] hover:bg-[#44A77D]
+                  bg-[#44A77D] hover:bg-[#3b9470]
                   transition-all duration-300
-                  disabled:opacity-50 cursor-pointer 
+                  disabled:opacity-50
                 "
               >
                 {loadingMore ? (
@@ -137,4 +150,4 @@ const CategoryPage = () => {
   );
 };
 
-export default CategoryPage;
+export default BudgetPage;

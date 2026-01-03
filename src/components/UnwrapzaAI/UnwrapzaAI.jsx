@@ -66,7 +66,7 @@ const UnwrapzaAI = () => {
                     <div className="max-w-[1200px] w-full px-4 flex flex-col md:flex-row gap-6 py-3 ">
 
                         {/* SEARCH COMPONENT */}
-                        <div className={`${showResults ? "hidden md:block" : "block"} w-full md:w-1/3`}>
+                        <div className={`${showResults ? "hidden lg:block" : "block"} w-full lg:w-1/3`}>
                             <AISearchComponent 
                                 setResults={setResults} 
                                 setIsSearching={setIsSearching}
@@ -75,7 +75,7 @@ const UnwrapzaAI = () => {
                         </div>
 
                         {/* RESULT COMPONENT */}
-                        <div className={`${showResults ? "block" : "hidden md:block"} w-full md:w-2/3`}>
+                        <div className={`${showResults ? "block" : "hidden lg:block"} w-full lg:w-2/3`}>
                             <AIResultComponent 
                                 results={results} 
                                 isSearching={isSearching}

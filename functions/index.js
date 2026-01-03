@@ -2,16 +2,11 @@ require("dotenv").config();
 
 const { setGlobalOptions } = require("firebase-functions");
 const { onRequest } = require("firebase-functions/https");
-const logger = require("firebase-functions/logger");
-const { onSchedule } = require("firebase-functions/v2/scheduler");
 const cors = require("cors")({ origin: true });
 const { Resend } = require("resend");
-const fetch = require("node-fetch");
-
 const admin = require("firebase-admin");
 const OpenAI = require("openai");
-
-const { defineSecret } = require("firebase-functions/params");
+const { createClient } = require("@supabase/supabase-js");
 
 admin.initializeApp();
 const db = admin.firestore();
@@ -21,6 +16,11 @@ setGlobalOptions({ maxInstances: 10 });
 
 // OpenAI client
 const client = new OpenAI({ apiKey: process.env.OPENAI_API_KEY,});
+
+const supabase = createClient(
+  process.env.SUPABASE_URL,
+  process.env.SUPABASE_SERVICE_ROLE_KEY
+)
 
 // ----- Helper: API spam prevention ----
 
@@ -38,26 +38,16 @@ async function embedText(text) {
     model: "text-embedding-3-small",
     input: text,
   });
-  return response.data[0].embedding;
+  return  response.data[0].embedding;
 }
 
-// ----- Helper: cosine similarity -----
-function cosineSimilarity(a, b) {
-  if (!Array.isArray(a) || !Array.isArray(b) || a.length !== b.length) return 0;
+async function embedBatch(texts) {
+  const response = await client.embeddings.create({
+    model: "text-embedding-3-small",
+    input: texts,
+  });
 
-  let dot = 0,
-    normA = 0,
-    normB = 0;
-
-  for (let i = 0; i < a.length; i++) {
-    dot += a[i] * b[i];
-    normA += a[i] * a[i];
-    normB += b[i] * b[i];
-  }
-
-  if (!normA || !normB) return 0;
-
-  return dot / (Math.sqrt(normA) * Math.sqrt(normB));
+  return response.data.map(d => d.embedding);
 }
 
 
@@ -176,39 +166,52 @@ exports.verifyCode = onRequest((req, res) => {
 exports.generateProductEmbeddings = onRequest((req, res) => {
   cors(req, res, async () => {
     try {
-      const snapshot = await db.collection("products").get();
+      const { data: products, error } = await supabase
+        .from("products")
+        .select("product_id, product_name, description, categories")
+        .is("embedding", null)
+        .limit(100);
 
-      if (snapshot.empty) return res.status(200).send("No products found.");
+      if (error) throw error;
 
-      let updatedCount = 0;
-
-      for (const doc of snapshot.docs) {
-        const data = doc.data();
-
-        const text = `
-          Name: ${data.name || ""}
-          Description: ${data.description || ""}
-          Type: ${data.type || ""}
-          Category: ${data.category || ""}
-        `;
-
-        if (!text.trim()) continue;
-
-        const embedding = await embedText(text);
-
-        await doc.ref.update({ embedding });
-        updatedCount++;
+      if (!products || products.length === 0) {
+        return res.status(200).json({ message: "No products to embed" });
       }
 
-      return res
-        .status(200)
-        .send(`Done. Updated embeddings for ${updatedCount} products.`);
+      // 1️⃣ Bouw embedding-teksten
+      const texts = products.map(p =>
+        `Name: ${p.product_name || ""}
+Description: ${p.description || ""}
+Categories: ${p.categories || ""}`.trim()
+      );
+
+      // 2️⃣ 1 OpenAI call → 100 embeddings
+      const embeddings = await embedBatch(texts);
+
+      // 3️⃣ Bulk payload
+      const updates = products.map((p, i) => ({
+        product_id: p.product_id,
+        embedding: embeddings[i],
+      }));
+
+      // 4️⃣ 1 bulk upsert
+      const { error: updateError } = await supabase
+        .from("products")
+        .upsert(updates, { onConflict: "product_id" });
+
+      if (updateError) throw updateError;
+
+      return res.status(200).json({
+        message: `Embedded ${products.length} products successfully`,
+      });
+
     } catch (err) {
-      console.error(err);
-      return res.status(500).send("Error generating embeddings.");
+      console.error("Error generating embeddings:", err);
+      return res.status(500).json({ error: "Server error" });
     }
   });
 });
+
 
 // ---------- 2. GiftFinder ----------
 exports.giftFinder = onRequest((req, res) => {
@@ -263,53 +266,38 @@ exports.giftFinder = onRequest((req, res) => {
         context,
         minPrice,
         maxPrice,
-        marketplace
       } = req.body || {};
 
-      let query = db.collection("products");
+      const MAX_ALLOWED_PRICE = 1500;
 
-      const priceField = `prices.${marketplace}`;
-
-      if (typeof minPrice === "number" && !isNaN(minPrice))
-        query = query.where(priceField, ">=", minPrice);
-
-      if (typeof maxPrice === "number" && !isNaN(minPrice))
-        query = query.where(priceField, "<=", maxPrice);
-
-      const snap = await query.get();
-      if (snap.empty) return res.status(200).json({ productIds: [] });
-
-      const products = snap.docs
-        .map((d) => ({ id: d.id, ...d.data() }))
-        .filter((p) => Array.isArray(p.embedding));
-
-      if (products.length === 0)
-        return res.status(200).json({ productIds: [] });
-
-      const userText = `
-        Gift for: ${relative}
-        Age: ${age}
-        Purpose: ${purpose}
-        Type: ${type}
-        Context: ${context}
-      `;
-
+      const safeMinPrice = minPrice != null ? Math.max(Number(minPrice), 0) : null;
+      const safeMaxPrice = maxPrice != null ? Math.min(Number(maxPrice), MAX_ALLOWED_PRICE) : null;
+      
+      const userText = `Gift for ${relative || "someone"}, age ${age || "unknown"}, purpose: ${purpose || "unspecified"}, type: ${type || "unspecified"}, context: ${context || "unspecified"}. Budget between ${minPrice || "any"} and ${maxPrice || "any"} euros.`.trim();
+      
       const userEmbedding = await embedText(userText);
 
-      const scored = products.map((p) => ({
-        id: p.id,
-        score: cosineSimilarity(userEmbedding, p.embedding),
-      }));
+      const {data, error} = await supabase.rpc("gift_match_products",{
+        query_embedding: userEmbedding,
+        min_price: safeMinPrice,
+        max_price: safeMaxPrice,
+        currency_filter: "EUR",
+        limit_count: 10,
+      });
 
-      scored.sort((a, b) => b.score - a.score);
+      if (error) {
+        console.error("Supabase AI error:", error);
+        return res.status(500).json({ error: "AI search failed" });
+      }
 
-      const top = scored.slice(0, 10).map((x) => x.id);
+      const productIds = data.map(row => row.product_id);
+      
+      return res.status(200).json({ productIds });
 
-      return res.status(200).json({ productIds: top });
-
+      
     } catch (err) {
-      console.error(err);
-      return res.status(500).send("Server error");
+      console.error("GiftFinder error:", err);
+      return res.status(500).json({ error: "Server error" });
     }
   });
 });

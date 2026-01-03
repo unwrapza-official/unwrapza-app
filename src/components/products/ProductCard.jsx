@@ -1,51 +1,38 @@
-import { addDoc, collection, increment, updateDoc, doc } from "firebase/firestore";
+import { addDoc, collection, updateDoc, doc, setDoc, deleteDoc, getDocs } from "firebase/firestore";
 import { useEffect, useState } from "react";
-import { auth } from "../../firebase";
-import { setDoc, deleteDoc, getDocs } from "firebase/firestore";
-import { db } from "../../firebase";
+import { auth, db } from "../../firebase";
 import { Heart } from "lucide-react"; 
 import { useNavigate } from "react-router-dom";
 import toast from "react-hot-toast";
-import { useUserCountry } from "../../hooks/useUserCountry"; 
-import { supabase } from "../../supabaseClient";
 
 const ProductCard = ({ product }) => {
-
   const navigate = useNavigate();
   const [wishlistIds, setWishlistIds] = useState([]);
-
-  const {marketplace, currency, loadingCountry} = useUserCountry();
+  const API_BASE = import.meta.env.DEV ? "http://localhost:3000" : "";
 
   const getCurrencySymbol = (currency) => {
-    switch(currency){
-      case "EUR": return "€";
-      case "GBP": return "£";
-      default: return "€";
-    }
-  }
+    const symbols = { EUR: "€", GBP: "£", USD: "$", CAD: "C$", AUD: "A$", JPY: "¥" };
+    return symbols[currency] || "";
+  };
 
   const displayPrice = product.price ?? null;
-
-  const priceSymbol = getCurrencySymbol(currency);
+  const priceSymbol = getCurrencySymbol(product.currency);
 
   const toggleWishlist = async (productId) => {
     const user = auth.currentUser;
-    if (!user) return toast.error("Log in to save products to your favorites!");
+    if (!user) return toast.error("Log in to save wishlist!");
 
     const itemRef = doc(db, "users", user.uid, "wishlist", productId);
-
     const exists = wishlistIds.includes(productId);
 
     if (exists) {
       await deleteDoc(itemRef);
       setWishlistIds(prev => prev.filter(id => id !== productId));
-      toast.success("Removed from wishlist") // UI direct updaten
+      toast.success("Removed from wishlist");
     } else {
-      await setDoc(itemRef, {
-        addedAt: new Date()
-      },
-       toast.success("Added to from wishlist"));
-      setWishlistIds(prev => [...prev, productId]); // UI direct updaten
+      await setDoc(itemRef, { addedAt: new Date() });
+      setWishlistIds(prev => [...prev, productId]);
+      toast.success("Added to wishlist");
     }
   };
 
@@ -53,51 +40,32 @@ const ProductCard = ({ product }) => {
     const loadWishlist = async () => {
       const user = auth.currentUser;
       if (!user) return;
-
       const ref = collection(db, "users", user.uid, "wishlist");
       const snap = await getDocs(ref);
-
-      const ids = snap.docs.map(d => d.id);
-      setWishlistIds(ids);
+      setWishlistIds(snap.docs.map(d => d.id));
     };
-
     loadWishlist();
   }, []);
 
-  const addToRecentlyViewed = (productId) => {
-    const key = "recently_viewed";
-    const existing = JSON.parse(localStorage.getItem(key)) || [];
-
-    const updated = [
-      productId,
-      ...existing.filter((id) => id !== productId),
-    ].slice(0, 20); // max 20
-
-    localStorage.setItem(key, JSON.stringify(updated));
-  };
-
-
   const handleClick = async () => {
     try {
-      // 1. Kliklog naar Firestore (dit mag blijven)
       await addDoc(collection(db, "clicks"), {
         productId: product.product_id,
         timeStamp: new Date(),
         platform: product.platform,
+        merchant: product.merchant,
       });
 
-      addToRecentlyViewed(product.product_id);
-
-      // 2. ClickCount verhogen in SUPABASE (niet meer in Firestore!)
-      await supabase
-        .from("products")
-        .update({ click_count: (product.click_count ?? 0) + 1 })
-        .eq("id", product.product_id);
-
+      fetch(`${API_BASE}/api/click`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ productId: product.product_id }),
+      }).catch(() => {});
+      
+      // Recent viewed logic...
+      navigate(`/product/${product.product_id}`);
     } catch (error) {
-      console.error("Error tracking click:", error);
-    } finally {
-      // 3. Navigeren MOET ALTIJD doorgaan
+      console.error("Error:", error);
       navigate(`/product/${product.product_id}`);
     }
   };
@@ -105,50 +73,62 @@ const ProductCard = ({ product }) => {
   return (
     <div
       onClick={handleClick}
-      className="group flex flex-col items-center rounded-1xl bg-white hover:-translate-y-1 transition-all duration-300 cursor-pointer"
+      className="group relative flex flex-col w-full bg-white transition-all duration-500 cursor-pointer"
     >
-      {/* IMAGE SECTION */}
-      <div className="relative w-full aspect-square overflow-hidden rounded-xl bg-[#F5FAF7] flex items-center justify-center">
+      {/* IMAGE CONTAINER */}
+      <div className="relative w-full aspect-[4/5] rounded-[1.8rem] overflow-hidden bg-[#F9F9F9] border border-gray-50 flex items-center justify-center transition-all duration-500 group-hover:shadow-2xl group-hover:shadow-gray-200 group-hover:-translate-y-1">
+        
+        {/* De Afbeelding */}
         <img
           src={product.images?.[0]}
           alt={product.product_name}
-          className="w-3/4 h-3/4 object-contain transition-transform duration-500 group-hover:scale-105"
+          className="w-[85%] h-[85%] object-contain mix-blend-multiply transition-transform duration-700 group-hover:scale-110"
         />
 
-        {/* HEART BUTTON RECHTSBOVEN */}
+        {/* WISHLIST BUTTON - Nu met een mooiere schaduw en blur */}
         <button
-          className="absolute top-3 right-3 z-20 
-                     bg-white/90 backdrop-blur-sm rounded-full p-2 
-                     shadow-sm hover:bg-white transition"
+          className="absolute top-4 right-4 z-20 bg-white/70 backdrop-blur-md rounded-full p-2.5 shadow-sm border border-white/50 transition-all duration-300 hover:bg-white hover:scale-110 active:scale-90"
           onClick={(e) => {
             e.stopPropagation();
             toggleWishlist(product.product_id);
           }}
         >
           <Heart
-            className={`w-5 h-5 transition-all
-              ${wishlistIds.includes(product.product_id)
+            className={`w-5 h-5 transition-all duration-300 ${
+              wishlistIds.includes(product.product_id)
                 ? "text-red-500 fill-red-500"
-                : "text-gray-600 hover:text-red-500"}`}
+                : "text-gray-400 group-hover:text-red-400"
+            }`}
           />
         </button>
       </div>
 
       {/* TEXT SECTION */}
-      <div className="w-full flex flex-col text-start mt-4 relative">
-        <p className="text-sm text-gray-400">{product.platform}</p>
-        <h3 className="mt-1 font-bold text-gray-800 text-base leading-snug font-poppins line-clamp-2">
-          {product.product_name}
-        </h3>
-        <h2 className="mt-2 font-bold text-[#44A77D] text-lg font-dmsans">
-          {
-            loadingCountry
-            ? "loading...."
-            : displayPrice !== null
-            ? `${priceSymbol}${displayPrice?.toFixed(2)}`
-            : "Price unavailable"
-          }
-        </h2>
+      <div className="mt-5 px-1">
+        <div className="flex justify-between items-start gap-2">
+          <div className="flex-1">
+            <p className="text-[10px] font-black text-[#44A77D] uppercase tracking-[0.15em] mb-1">
+              {product.merchant}
+            </p>
+            <h3 className="font-bold text-gray-800 text-[15px] leading-tight line-clamp-2 transition-colors group-hover:text-black">
+              {product.product_name}
+            </h3>
+          </div>
+        </div>
+
+        {/* PRIJS & EXTRA'S */}
+        <div className="mt-3 flex items-center justify-between">
+          <div className="flex flex-col">
+            <span className="text-lg font-black text-[#44A77D] font-dmsans">
+              {!displayPrice ? "..." : `${priceSymbol}${displayPrice?.toFixed(2)}`}
+            </span>
+          </div>
+          
+          {/* Subtiel pijltje dat verschijnt op hover */}
+          <div className="w-8 h-8 rounded-full bg-gray-50 flex items-center justify-center opacity-0 -translate-x-2 group-hover:opacity-100 group-hover:translate-x-0 transition-all duration-300">
+            <span className="text-gray-400 text-sm">→</span>
+          </div>
+        </div>
       </div>
     </div>
   );

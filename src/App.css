@@ -8,11 +8,6 @@
 /* ✅ Je eigen custom styles hieronder */
 body {
   font-family: 'DM Sans', 'Poppins', sans-serif;
-  overflow-x: hidden;
-}
-
-body::-webkit-scrollbar {
-  display: none;
 }
 
 .no-scrollbar {

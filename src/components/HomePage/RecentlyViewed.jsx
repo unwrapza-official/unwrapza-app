@@ -1,29 +1,36 @@
 import { useEffect, useRef, useState } from "react";
 import { ChevronLeft, ChevronRight } from "lucide-react";
-import { supabase } from "../../supabaseClient";
 import ProductCard from "../products/ProductCard";
 
 const RecentlyViewed = () => {
   const [products, setProducts] = useState([]);
   const scrollRef = useRef(null);
-
+  const API_BASE = import.meta.env.DEV ? "http://localhost:3000" : "";
+  
   useEffect(() => {
     const ids = JSON.parse(localStorage.getItem("recently_viewed")) || [];
     if (ids.length === 0) return;
 
     const fetchProducts = async () => {
-      const { data, error } = await supabase
-        .from("products")
-        .select("*")
-        .in("product_id", ids);
+      try {
+        const res = await fetch(
+          `${API_BASE}/api/products?type=ids&ids=${ids.join(",")}`
+        );
 
-      if (!error && data) {
-        // volgorde herstellen zoals bekeken
+        if (!res.ok) throw new Error("Failed to fetch recently viewed");
+
+        const json = await res.json();
+        const apiProducts = json.products || [];
+
+        // 👉 volgorde herstellen zoals bekeken
         const ordered = ids
-          .map((id) => data.find((p) => p.product_id === id))
+          .map((id) => apiProducts.find((p) => p.product_id === id))
           .filter(Boolean);
 
         setProducts(ordered);
+      } catch (err) {
+        console.error("RecentlyViewed error:", err);
+        setProducts([]);
       }
     };
 
@@ -41,17 +48,24 @@ const RecentlyViewed = () => {
 
   return (
     <section className="w-full max-w-[1200px] mx-auto px-4 mb-20">
-      <div className="flex items-center justify-between mb-4">
-        <h2 className="text-1xl md:text-2xl font-semibold">Recently viewed</h2>
+      <div className="flex flex-col mb-10">
+        <h2 className="text-2xl md:text-3xl font-extrabold text-gray-900 tracking-tight mb-2">
+          Recently <span className="text-[#44A77D]">Viewed</span>
+        </h2>
+        <div className="h-1 w-12 bg-[#44A77D] rounded-full"></div>
       </div>
 
       <div className="relative">
+        {products.length > 4 ? (
         <button
           onClick={() => scroll("left")}
           className="absolute left-0 top-1/2 -translate-y-1/2 z-10 bg-white/90 border border-gray-200 hover:bg-[#44A77D] hover:text-white p-2 rounded-full shadow-md transition"
         >
           <ChevronLeft className="w-5 h-5" />
-        </button>
+        </button>) 
+        : 
+        null
+        }
 
         <div
           ref={scrollRef}
@@ -67,12 +81,15 @@ const RecentlyViewed = () => {
           ))}
         </div>
 
+        {products.length > 4 ? (
         <button
           onClick={() => scroll("right")}
           className="absolute right-0 top-1/2 -translate-y-1/2 z-10 bg-white/90 border border-gray-200 hover:bg-[#44A77D] hover:text-white p-2 rounded-full shadow-md transition"
         >
           <ChevronRight className="w-5 h-5" />
         </button>
+          ) : null
+        }
       </div>
     </section>
   );

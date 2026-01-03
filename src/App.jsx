@@ -6,8 +6,6 @@ import LoginPage from './pages/LoginPage'
 import Footer from './components/Footer'
 import NotFoundPage from './pages/NotFoundPage'
 import ScrollToTop from './utils/ScrollToTop'
-import AdminRoute from './components/auth/AdminRoute'
-import AdminPage from "./pages/account/AdminPage"
 import SearchResults from "./pages/SearchResults" 
 import AccountLayout from "./pages/account/AccountLayout"
 import CalendarPage from "./pages/account/AccountCalendarPage"
@@ -20,6 +18,8 @@ import Disclaimer from './pages/legal/Disclaimer'
 import TermsConditions from './pages/legal/TermsConditions'
 import PrivacyPolicy from './pages/legal/PrivacyPolicy'
 import CookiePolicy from './pages/legal/CookiePolicy'
+import BudgetPage from './pages/BudgetPage'
+import ContactPage from './pages/ContactPage'
 import CategoryPage from './pages/CategoryPage'
 import About from './pages/About'
 import {Toaster} from 'react-hot-toast';
@@ -76,6 +76,7 @@ function App() {
       <Routes>
         <Route path="/" element={<HomePage />}/>
         <Route path="/about" element={<About/>}/>
+        <Route path="/contact" element={<ContactPage/>}/>
         <Route path="/cookiepolicy" element={<CookiePolicy/>}/>
         <Route path="/privacy" element={<PrivacyPolicy/>}/>
         <Route path="/disclaimer" element={<Disclaimer/>}/>
@@ -87,8 +88,8 @@ function App() {
           <Route path="wishlist" element={<WishlistPage />} />
         </Route>
         <Route path="/category/:slug" element={<CategoryPage/>}/>
+        <Route path="/budget" element={<BudgetPage/>}/>
         <Route path="/login" element={<LoginPage />}/>
-        <Route path="/admin" element={<AdminRoute><AdminPage /></AdminRoute>}/>
         <Route path ="/product/:id" element={<ProductDetails/>}/>
         <Route path="/search" element={<SearchResults />}/>
         <Route path="/*" element={<NotFoundPage/>}/>

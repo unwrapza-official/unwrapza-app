@@ -1,19 +1,14 @@
+import React from "react";
+import { Link } from "react-router-dom";
+import UpperColors from "./UpperColors";
+
 var currentYear = new Date().getFullYear();
 
 const Footer = () => {
   return (
-    <footer className="w-full bg-white">
+    <footer className="w-full bg-white relative">
       {/* 🌈 Top Colors */}
-      <div className="w-full h-1 flex">
-        <div className="flex-1" style={{ backgroundColor: "#FFFB84" }}></div>
-        <div className="flex-1" style={{ backgroundColor: "#84FF96" }}></div>
-        <div className="flex-1" style={{ backgroundColor: "#84F3FF" }}></div>
-        <div className="flex-1" style={{ backgroundColor: "#84B9FF" }}></div>
-        <div className="flex-1" style={{ backgroundColor: "#9084FF" }}></div>
-        <div className="flex-1" style={{ backgroundColor: "#DC84FF" }}></div>
-        <div className="flex-1" style={{ backgroundColor: "#FF84F7" }}></div>
-        <div className="flex-1" style={{ backgroundColor: "#FF787A" }}></div>
-      </div>
+      <UpperColors />
 
       {/* 💬 Top Section */}
       <div className="w-full max-w-[1200px] mx-auto px-4 py-12 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-10 border-b border-gray-100">
@@ -23,9 +18,11 @@ const Footer = () => {
           <p className="text-gray-500 text-sm max-w-[260px] sm:max-w-full">
             Our support team is happy to assist you with anything related to Unwrapza.
           </p>
-          <button className="border-2 border-[#44A77D] px-10 h-[48px] rounded-md font-semibold text-gray-800 hover:bg-[#44A77D] hover:text-white transition-all duration-300">
-            Contact us
-          </button>
+          <Link to="/contact">
+            <button className="border-2 border-[#44A77D] px-10 h-[48px] rounded-md font-semibold text-gray-800 hover:bg-[#44A77D] hover:text-white transition-all duration-300 cursor-pointer">
+              Contact us
+            </button>
+          </Link>
         </div>
 
         {/* Pages Section */}
@@ -63,7 +60,7 @@ const Footer = () => {
               aria-label="Email address"
               className="flex-1 py-2 border border-gray-300 rounded-md px-3 text-sm focus:outline-none focus:ring-2 focus:ring-[#44A77D] transition-all"
             />
-            <button className="bg-[#44A77D] text-white font-semibold px-5 py-3 rounded-md hover:bg-[#004a31] transition-all">
+            <button className="bg-[#44A77D] text-white font-semibold px-5 py-3 rounded-md hover:bg-[#004a31] transition-all cursor-pointer">
               Sign up
             </button>
           </div>
@@ -82,11 +79,6 @@ const Footer = () => {
               <li>
                 <a href="/about" className="hover:opacity-80 transition-opacity">
                   About
-                </a>
-              </li>
-              <li>
-                <a href="/newsletter" className="hover:opacity-80 transition-opacity">
-                  Newsletter
                 </a>
               </li>
               <li>
@@ -134,7 +126,7 @@ const Footer = () => {
             </h3>
               <li>
                 <a
-                  href="https://instagram.com/unwrapza"
+                  href="https://instagram.com/unwrapzacom"
                   target="_blank"
                   rel="noreferrer"
                   className="hover:opacity-80 transition-opacity"
@@ -164,7 +156,7 @@ const Footer = () => {
               </li>
               <li>
                 <a
-                  href="mailto:info@unwrapza.com"
+                  href="mailto:contact@unwrapza.com"
                   className="hover:opacity-80 transition-opacity"
                 >
                   Email

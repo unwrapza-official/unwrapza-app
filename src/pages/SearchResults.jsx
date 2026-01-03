@@ -1,43 +1,54 @@
 import { useSearchParams } from "react-router-dom";
 import { useEffect, useState } from "react";
-import { supabase } from "../supabaseClient";
 import SearchProductCard from "../components/products/SearchProductCard";
+
+const PAGE_SIZE = 20;
 
 const SearchResults = () => {
   const [params] = useSearchParams();
   const query = params.get("query")?.toLowerCase() || "";
 
-  const [totalCount, setTotalCount] = useState(0);
-  const [products, setProducts] = useState([]); // all loaded items
-  const [filtered, setFiltered] = useState([]); // sorted items
+  const [products, setProducts] = useState([]);
+  const [filtered, setFiltered] = useState([]);
 
   const [page, setPage] = useState(0);
   const [filter, setFilter] = useState("relevance");
+  const [loading, setLoading] = useState(false);
 
-  const PAGE_SIZE = 20;
+  const API_BASE = import.meta.env.DEV ? "http://localhost:3000" : "";
 
   // -----------------------------
   // Load first page on query change
   // -----------------------------
   useEffect(() => {
     const load = async () => {
-      setPage(0); // reset pagination
-      setProducts([]); // reset loaded data
+      if (!query) return;
 
-      const { data, error, count } = await supabase
-        .from("products")
-        .select("*", {count: "exact"})
-        .ilike("product_name", `%${query}%`)
-        .range(0, PAGE_SIZE - 1);
+      setLoading(true);
+      setPage(0);
+      setProducts([]);
 
-      if (error) {
-        console.log(error);
-        return;
+      try {
+        const res = await fetch(
+          `${API_BASE}/api/products?type=search&q=${encodeURIComponent(
+            query
+          )}&page=0&limit=${PAGE_SIZE}`
+        );
+
+        if (!res.ok) throw new Error("Search failed");
+
+        const json = await res.json();
+        const data = json.products || [];
+
+        setProducts(data);
+        setFiltered(data);
+      } catch (err) {
+        console.error("Search error:", err);
+        setProducts([]);
+        setFiltered([]);
       }
 
-      setProducts(data);
-      setFiltered(data);
-      setTotalCount(count || 0);
+      setLoading(false);
     };
 
     load();
@@ -48,29 +59,31 @@ const SearchResults = () => {
   // -----------------------------
   const loadMore = async () => {
     const nextPage = page + 1;
-    const start = nextPage * PAGE_SIZE;
-    const end = start + PAGE_SIZE - 1;
 
-    const { data, error } = await supabase
-      .from("products")
-      .select("*")
-      .ilike("product_name", `%${query}%`)
-      .range(start, end);
+    try {
+      const res = await fetch(
+        `${API_BASE}/api/products?type=search&q=${encodeURIComponent(
+          query
+        )}&page=${nextPage}&limit=${PAGE_SIZE}`
+      );
 
-    if (error) {
-      console.log(error);
-      return;
+      if (!res.ok) throw new Error("Load more failed");
+
+      const json = await res.json();
+      const data = json.products || [];
+
+      const updated = [...products, ...data];
+      setProducts(updated);
+      setPage(nextPage);
+
+      applyFilter(filter, updated);
+    } catch (err) {
+      console.error("Load more error:", err);
     }
-
-    const updated = [...products, ...data];
-    setProducts(updated);
-    setPage(nextPage);
-
-    applyFilter(filter, updated);
   };
 
   // -----------------------------
-  // Filter logic
+  // Filter logic (client-side)
   // -----------------------------
   const applyFilter = (filterType, baseList) => {
     let sorted = [...baseList];
@@ -90,7 +103,7 @@ const SearchResults = () => {
 
       case "relevance":
       default:
-        sorted = [...baseList]; // keep original order
+        sorted = [...baseList];
         break;
     }
 
@@ -112,7 +125,7 @@ const SearchResults = () => {
 
       <div className="w-full flex justify-between items-center mb-10">
         <h2 className="text-1xl font-semibold text-gray-600">
-          {totalCount} results
+          {filtered.length} results
         </h2>
 
         <select
@@ -127,22 +140,26 @@ const SearchResults = () => {
         </select>
       </div>
 
-      {filtered.length === 0 ? (
+      {loading && <p>Searching...</p>}
+
+      {!loading && filtered.length === 0 ? (
         <p>No products found.</p>
       ) : (
         <>
           <div className="flex flex-col gap-5">
             {filtered.map((product) => (
-              <SearchProductCard key={product.product_id} product={product} />
+              <SearchProductCard
+                key={product.product_id}
+                product={product}
+              />
             ))}
           </div>
 
-          {/* Load more button */}
           {filtered.length >= PAGE_SIZE && (
             <div className="flex justify-center mt-8">
               <button
                 onClick={loadMore}
-                className="px-4 py-2 border rounded-lg bg-[#44A77D] text-white hover:cursor-pointer"
+                className="px-4 py-2 border rounded-lg bg-[#44A77D] text-white cursor-pointer hover:bg-[#368664] transition"
               >
                 Load more
               </button>

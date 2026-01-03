@@ -13,7 +13,7 @@ const AISearchComponent = ({setResults, setIsSearching, setShowResults}) => {
   const [errorMessage, setErrorMessage] = useState("");
   const [loading, setLoading] = useState(false);
 
-  const {marketplace} = useUserCountry();
+  const MAX_ALLOWED_PRICE = 1500;
 
   const formatPrice = (value) => {
     if (!value) return "";
@@ -23,6 +23,7 @@ const AISearchComponent = ({setResults, setIsSearching, setShowResults}) => {
   };
   
   const handleClick = async (e) => {
+    setErrorMessage("");
     e.preventDefault();
 
     const errors = [];
@@ -33,6 +34,10 @@ const AISearchComponent = ({setResults, setIsSearching, setShowResults}) => {
     if(!type) errors.push("Please select the type of gift.");
     if(!minPrice) errors.push("Please enter a minimum price.");
     if(!maxPrice) errors.push("Please enter a maximum price.");
+    if(minPrice && isNaN(Number(minPrice))) errors.push("Minimum price must be a valid number.");
+
+    const sanitizedMax = Math.min(Number(maxPrice), MAX_ALLOWED_PRICE);
+    const sanitizedMin = Math.max(Number(minPrice), 0);
 
     if(errors.length > 0){
       toast.error(errors.join("\n"))
@@ -48,9 +53,8 @@ const AISearchComponent = ({setResults, setIsSearching, setShowResults}) => {
       purpose,
       type,
       context,
-      minPrice: Number(minPrice),
-      maxPrice: Number(maxPrice),
-      marketplace,
+      minPrice: sanitizedMin,
+      maxPrice: sanitizedMax,
     };
 
     console.log(formData);
@@ -86,20 +90,20 @@ const AISearchComponent = ({setResults, setIsSearching, setShowResults}) => {
       setErrorMessage(error.message);
     } finally{
       setLoading(false);
-      setIsSearching(false)
+      setIsSearching(false);
     }
   }
 
   return (
     <div className=" h-full flex flex-col items-center md:items-start">
       {/* Search container */}
-      <div className="w-9/10 h-full flex flex-col justify-evenly">
+      <div className="w-9/10 h-full flex flex-col mx-auto lg:mx-0 justify-evenly">
+
         <h1 className="italic font-roboto font-bold text-white text-lg lg:text-xl">
           Let AI find 
           <span className="text-[#388dff]"> your </span> 
           perfect gift
         </h1>
-
         {/* Search form */}
         <form className="w-full max-w-2xl mx-auto py-2 grid grid-cols-2 gap-3 text-white text-lg font-roboto font-bold">
           
@@ -211,7 +215,11 @@ const AISearchComponent = ({setResults, setIsSearching, setShowResults}) => {
                 type="number"
                 value={minPrice}
                 onChange={(e) => setMinPrice(e.target.value)}
-                onBlur={() => setMinPrice(formatPrice(minPrice))}
+                onBlur={() => {
+                  const numeric = Number(minPrice) || 0;
+                  const clamped = Math.max(numeric, 0);
+                  setMinPrice(formatPrice(String(clamped)));
+                }}
                 className="w-1/2 h-9 px-3 bg-green text-white font-semibold rounded-[6px] border-3
                            shadow-[4px_4px_0_#FFFFFF] hover:shadow-[0_0_0_#FFFFFF]
                            hover:translate-x-[4px] hover:translate-y-[4px]
@@ -223,7 +231,11 @@ const AISearchComponent = ({setResults, setIsSearching, setShowResults}) => {
                 type="number"
                 value={maxPrice}
                 onChange={(e) => setMaxPrice(e.target.value)}
-                onBlur={() => setMaxPrice(formatPrice(maxPrice))}
+                onBlur={() => {
+                  const numeric = Number(maxPrice) || 0
+                  const clamped = Math.min(numeric, MAX_ALLOWED_PRICE);
+                  setMaxPrice(formatPrice(String(clamped)));
+                }}
                 className="w-1/2 h-9 px-3 bg-green text-white font-semibold rounded-[6px] border-3
                            shadow-[4px_4px_0_#FFFFFF] hover:shadow-[0_0_0_#FFFFFF]
                            hover:translate-x-[4px] hover:translate-y-[4px]

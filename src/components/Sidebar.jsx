@@ -1,24 +1,19 @@
 import { motion, AnimatePresence } from "framer-motion";
-import { useEffect, useState } from "react";
-import { X } from "lucide-react";
+import { useEffect } from "react";
+import { X, ChevronRight } from "lucide-react";
 import { Link } from "react-router-dom";
 
 const Sidebar = ({ isOpen, onClose, categories = [], headerHeight = 0 }) => {
   
-
   // 🧊 Lock scroll en bewaar positie
   useEffect(() => {
     if (isOpen) {
       const currentScrollY = window.scrollY;
-     
-
-      // Body "bevriezen"
       document.body.style.position = "fixed";
       document.body.style.top = `-${currentScrollY}px`;
       document.body.style.width = "100%";
       document.body.style.overflow = "hidden";
     } else {
-      // Scrollpositie herstellen
       const scrollYString = document.body.style.top;
       document.body.style.position = "";
       document.body.style.top = "";
@@ -35,15 +30,13 @@ const Sidebar = ({ isOpen, onClose, categories = [], headerHeight = 0 }) => {
     };
   }, [isOpen]);
 
-  // 🧭 Bereken de top-positie, zelfs na scrollen
-
   return (
     <AnimatePresence>
       {isOpen && (
         <>
-          {/* 🔳 Donkere overlay */}
+          {/* 🔳 Overlay */}
           <motion.div
-            className="fixed left-0 right-0 bottom-0 bg-black/40 z-40 md:hidden"
+            className="fixed inset-0 bg-black/40 z-40 md:hidden"
             style={{ top: `${headerHeight}px` }}
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
@@ -51,7 +44,7 @@ const Sidebar = ({ isOpen, onClose, categories = [], headerHeight = 0 }) => {
             onClick={onClose}
           />
 
-          {/* 🧭 Sidebar-panel */}
+          {/* 🧭 Sidebar-panel (100% breedte behouden) */}
           <motion.aside
             className="fixed left-0 w-full bg-white z-50 shadow-2xl flex flex-col md:hidden"
             style={{
@@ -61,63 +54,65 @@ const Sidebar = ({ isOpen, onClose, categories = [], headerHeight = 0 }) => {
             initial={{ x: "-100%" }}
             animate={{ x: 0 }}
             exit={{ x: "-100%" }}
-            transition={{ type: "spring", stiffness: 100, damping: 20 }}
+            transition={{ type: "spring", stiffness: 110, damping: 20 }}
           >
             {/* Header */}
-            <div className="flex items-center justify-between p-4 border-b border-gray-200">
-              <h2 className="text-lg text-[#44A77D] font-semibold italic">
-                Unwrapza Menu
+            <div className="flex items-center justify-between p-5 border-b border-gray-100">
+              <h2 className="text-xl font-bold text-[#44A77D]">
+                Menu
               </h2>
               <button
                 onClick={onClose}
-                className="p-2 rounded-full hover:bg-gray-100 transition"
+                className="p-2 rounded-full hover:bg-gray-100 transition-colors"
               >
-                <X className="w-6 h-6 text-[#44A77D]" />
+                <X className="w-6 h-6 text-gray-400" />
               </button>
             </div>
 
             {/* Categorieën */}
-            <nav className="flex-1 overflow-y-auto px-5 py-2 mb-5">
+            <nav className="flex-1 overflow-y-auto px-4 py-4">
               {categories.length > 0 ? (
-                <ul className="space-y-3">
+                <ul className="space-y-1">
                   {categories.map((cat, index) => (
-                    <Link 
-                    key={index}
-                    to={cat.path}
-                    >
-                      <div className="w-full flex items-center gap-3 py-2 px-2 rounded-md hover:bg-gray-100 transition">
-                        {/* Category icon */}
-                        <img
-                          className="w-10 h-10 object-contain rounded-md"
-                          src={cat.image}
-                          alt={cat.name}
-                        />
+                    <li key={index}>
+                      <Link 
+                        to={cat.path} 
+                        onClick={onClose}
+                        className="group flex items-center justify-between w-full p-3 rounded-xl hover:bg-gray-50 transition-all active:scale-[0.98]"
+                      >
+                        <div className="flex items-center gap-4">
+                          {/* Image box voor betere uitlijning */}
+                          <div className="w-12 h-12 bg-gray-50 rounded-lg flex items-center justify-center overflow-hidden border border-gray-100">
+                            <img
+                              className="w-9 h-9 object-contain"
+                              src={cat.image}
+                              alt={cat.name}
+                            />
+                          </div>
 
-                        {/* Text + underline */}
-                        <button
-                          className="flex flex-col w-full text-left text-[17px] text-gray-800 font-medium"
-                          onClick={() => {
-                            console.log(`Clicked ${cat.name}`);
-                            onClose();
-                          }}
-                        >
-                          <span>{cat.name}</span>
-                        </button>
-                      </div>
-                      <div className="w-full h-[1px] bg-gray-200 mt-2"></div>
-                    </Link>
+                          <span className="text-[17px] text-gray-800 font-extrabold group-hover:text-[#44A77D] transition-colors">
+                            {cat.name}
+                          </span>
+                        </div>
+                        
+                        {/* Subtiel pijltje voor de 'smooth' factor */}
+                        <ChevronRight className="w-5 h-5 text-gray-300 group-hover:text-[#44A77D] group-hover:translate-x-1 transition-all" />
+                      </Link>
+                    </li>
                   ))}
                 </ul>
               ) : (
-                <p className="text-gray-500 text-sm">
-                  No categories available.
+                <p className="text-gray-400 text-sm text-center mt-10">
+                  Geen categorieën gevonden.
                 </p>
               )}
             </nav>
 
             {/* Footer */}
-            <div className="p-5 border-t border-gray-200 text-sm text-gray-500 text-center">
-              <p>© {new Date().getFullYear()} Unwrapza</p>
+            <div className="p-6 border-t border-gray-100 text-center">
+              <p className="text-[11px] font-bold uppercase tracking-widest text-gray-400">
+                © {new Date().getFullYear()} Unwrapza
+              </p>
             </div>
           </motion.aside>
         </>

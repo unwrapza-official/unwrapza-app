@@ -1,61 +1,63 @@
 import { useState } from "react";
-import { ChevronRight, ChevronLeft } from "lucide-react";
+import { ChevronRight, ChevronLeft, ArrowUpRight } from "lucide-react";
 import { useNavigate } from "react-router-dom";
-import { addDoc, updateDoc, doc, increment, collection } from "firebase/firestore";
+import { addDoc, collection } from "firebase/firestore";
 import { db } from "../../firebase";
-import { useUserCountry } from "../../hooks/useUserCountry";
 
 const AICarousel = ({ products }) => {
-  const [index, setIndex] = useState(1); // start in 't midden
+  const [index, setIndex] = useState(1);
+  const [touchStart, setTouchStart] = useState(null);
+  const [touchEnd, setTouchEnd] = useState(null);
 
   const navigate = useNavigate();
-  const { marketplace, currency, loadingCountry } = useUserCountry();
+
+  // Swipe logica voor mobiel
+  const minSwipeDistance = 50;
+
+  const onTouchStart = (e) => {
+    setTouchEnd(null);
+    setTouchStart(e.targetTouches[0].clientX);
+  };
+
+  const onTouchMove = (e) => setTouchEnd(e.targetTouches[0].clientX);
+
+  const onTouchEnd = () => {
+    if (!touchStart || !touchEnd) return;
+    const distance = touchStart - touchEnd;
+    if (distance > minSwipeDistance) next();
+    if (distance < -minSwipeDistance) prev();
+  };
 
   const getCurrencySymbol = (currency) => {
-    switch (currency) {
-      case "EUR": return "€";
-      case "GBP": return "£";
-      default: return "€";
-    }
+    const symbols = { EUR: "€", GBP: "£", USD: "$", CAD: "C$", AUD: "A$", JPY: "¥" };
+    return symbols[currency] || "";
   };
 
-  const priceSymbol = getCurrencySymbol(currency);
+  const prev = () => index > 0 && setIndex(index - 1);
+  const next = () => index < products.length - 1 && setIndex(index + 1);
 
-  // === NAV FUNCTIONS ===
-  const prev = () => {
-    if (index > 0) setIndex(index - 1);
-  };
-
-  const next = () => {
-    if (index < products.length - 1) setIndex(index + 1);
-  };
-
-  // === CARD RENDER FUNCTION ===
   const getCard = (offset) => {
     const productIndex = index + offset;
-
-    if (productIndex < 0 || productIndex >= products.length) return null;
+    if (productIndex < 0 || productIndex >= products.length) {
+      return <div className="hidden md:block md:w-[28%] pointer-events-none" />; 
+    }
 
     const product = products[productIndex];
     const isCenter = offset === 0;
-
-    // ⭐ FIXED PRICE SYSTEM ⭐
-    const displayPrice =
-      product?.prices?.[marketplace] ??
-      product?.prices?.de ??
-      null;
 
     const handleClick = async () => {
       try {
         await addDoc(collection(db, "clicks"), {
           productId: product.product_id,
           timeStamp: new Date(),
-          platform: product.platform,
+          platform: product.merchant,
         });
 
-        await updateDoc(doc(db, "products", product.product_id), {
-          clickCount: increment(1),
-        });
+        fetch(`${BASE_URL}/api/click`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ productId: product.product_id }),
+        }).catch(() => {});
 
         navigate(`/product/${product.product_id}`);
       } catch (error) {
@@ -66,70 +68,69 @@ const AICarousel = ({ products }) => {
     return (
       <div
         key={product.product_id}
+        onTouchStart={onTouchStart}
+        onTouchMove={onTouchMove}
+        onTouchEnd={onTouchEnd}
         className={`
-          relative transition-all duration-500 ease-out
-          rounded-3xl p-4 shadow-2xl border border-white/10 backdrop-blur-sm
-          bg-gray-100
-          ${isCenter
-            ? "w-[42%] scale-105 z-30 opacity-100"
-            : "w-[28%] scale-90 opacity-60 blur-[1px] hover:opacity-80 hover:blur-0"
+          relative transition-all duration-500 ease-out flex flex-col
+          /* Vaste hoogte om verspringen te voorkomen */
+          h-[420px] 
+          ${isCenter 
+            ? "w-full md:w-[42%] z-30 scale-100 opacity-100 bg-white shadow-2xl border border-slate-100 rounded-2xl p-5" 
+            : "hidden md:flex md:w-[28%] z-10 scale-90 opacity-40 blur-[1px] bg-slate-50/50 border border-transparent rounded-2xl p-5"
           }
         `}
-        style={{ transform: `translateY(${isCenter ? "-10px" : "10px"})` }}
       >
-        <div className="relative w-full h-44 rounded-2xl overflow-hidden shadow-lg">
+        <div className="w-full h-50 flex-shrink-0 mb-4 rounded-xl overflow-hidden bg-white flex items-center justify-center p-2">
           <img
             src={product.images?.[0]}
             alt={product.product_name}
-            className="w-full h-full object-contain transition-transform duration-500"
+            className="max-w-full max-h-full object-contain mix-blend-multiply"
           />
         </div>
-        <p className="text-sm mt-2 text-gray-500">
-          {product.platform}
-        </p>
-        <h2 className="text-lg font-bold text-black line-clamp-2">
-          {product.product_name}
-        </h2>
 
-        <p className="text-black text-sm mt-1 line-clamp-3">
-          {product.description}
-        </p>
-
-        <p className="text-[#44A77D] font-semibold text-xl mt-3">
-          {loadingCountry
-              ? "Loading..."
-              : displayPrice !== null
-                ? `${priceSymbol}${displayPrice.toFixed(2)}`
-                : "Price unavailable"}
-        </p>
-
-        <button
-          onClick={handleClick}
-          className="
-            mt-4 block bg-white text-green font-bold p-2 rounded-xl text-center
-            shadow-lg hover:shadow-xl hover:bg-white/90 transition hover:cursor-pointer
-          "
-        >
-          View Product
-        </button>
+        <div className="flex flex-col text-left flex-grow">
+          <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest block h-4">
+            {product.merchant}
+          </span>
+          
+          <h2 className={`font-bold text-slate-900 leading-tight mt-1 overflow-hidden ${isCenter ? "text-lg line-clamp-2" : "text-sm line-clamp-1"}`}>
+            {product.product_name}
+          </h2>
+          
+          {isCenter && (
+            <div className="mt-auto flex items-center justify-between pt-4 border-t border-slate-100">
+              <div>
+                <span className="block text-[10px] text-slate-400 font-medium uppercase tracking-wider">Price</span>
+                <span className="text-xl font-extrabold text-[#10B981]">
+                  {getCurrencySymbol(product.currency)}{product.price.toFixed(2)}
+                </span>
+              </div>
+              <button
+                onClick={handleClick}
+                className="bg-slate-900 text-white px-6 py-3 rounded-xl text-xs font-bold hover:bg-black transition-all flex items-center shadow-lg hover:cursor-pointer active:scale-95"
+              >
+                View <ArrowUpRight size={14} />
+              </button>
+            </div>
+          )}
+        </div>
       </div>
     );
   };
 
   return (
-    <div className="w-full flex flex-col items-center">
-      <div className="flex items-center justify-center gap-3">
+    <div className="w-full flex flex-col items-center bg-transparent">
+      <div className="flex items-center justify-center gap-4 w-full max-w-6xl px-4 md:px-0">
         <button
           onClick={prev}
-          className="
-            text-black bg-white px-1 py-2 rounded-[5px] shadow-md hover:bg-green
-            transition backdrop-blur-sm border border-white/10
-          "
+          disabled={index === 0}
+          className="hidden md:block p-3 rounded-full bg-white border border-slate-200 shadow-sm hover:bg-slate-50 disabled:opacity-20 transition-all active:scale-90 hover:cursor-pointer"
         >
-          <ChevronLeft />
+          <ChevronLeft className="text-slate-700" size={22} />
         </button>
 
-        <div className="flex items-center justify-center gap-4 w-full max-w-[1000px]">
+        <div className="flex items-center justify-center gap-4 flex-1 min-h-[440px]">
           {getCard(-1)}
           {getCard(0)}
           {getCard(1)}
@@ -137,13 +138,21 @@ const AICarousel = ({ products }) => {
 
         <button
           onClick={next}
-          className="
-            text-black bg-white px-1 py-2 rounded-[5px] shadow-md hover:bg-green
-            transition backdrop-blur-sm border border-white/10
-          "
+          disabled={index === products.length - 1}
+          className="hidden md:block p-3 rounded-full bg-white border border-slate-200 shadow-sm hover:bg-slate-50 disabled:opacity-20 transition-all active:scale-90 hover:cursor-pointer"
         >
-          <ChevronRight />
+          <ChevronRight className="text-slate-700" size={22} />
         </button>
+      </div>
+      
+      {/* Indicatie balk - Nu zichtbaar op PC en Mobiel */}
+      <div className="flex gap-1.5 mt-6 md:mt-2">
+        {products.map((_, i) => (
+          <div 
+            key={i} 
+            className={`h-1.5 rounded-full transition-all duration-300 ${i === index ? "w-8 bg-slate-800" : "w-2 bg-slate-100"}`}
+          />
+        ))}
       </div>
     </div>
   );

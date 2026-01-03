@@ -13,7 +13,7 @@ import home_living from "../assets/categories/Home_living.png"
 import funny_gifts from "../assets/categories/Funny_gifts.png"
 import luxury_picks from "../assets/categories/Luxury_picks.png"
 import For_kids from "../assets/categories/For_kids.png"
-import MarketplaceIndicator from './MarketplaceIndicator';
+
 
 const Header = () => {
 
@@ -101,7 +101,7 @@ const Header = () => {
 
                             {/* Slogan (desktop only) */}
                             <div className="hidden md:flex w-1/3 justify-start items-center">
-                            <p className="font-roboto italic font-semibold text-[#44A77D] md:text-md xl:text-lg tracking-wide leading-snug hover:text-[#84B9FF] transition-colors duration-300 w-full max-w-[250px]">
+                            <p className="font-roboto italic font-semibold text-[#44A77D] text-md tracking-wide leading-snug hover:text-[#84B9FF] transition-colors duration-300 w-full max-w-[250px]">
                                 Because the best gifts are found, not searched
                             </p>
                             </div>
@@ -113,11 +113,6 @@ const Header = () => {
                                     src={unwrapza}
                                 />
                              </Link>
-                            </div>
-
-                            {/* Country (Mobiel) */}
-                            <div className='block sm:hidden absolute right-15'>
-                                <MarketplaceIndicator/>
                             </div>
 
                             {/* Buttons (altijd tegen rechterkant) */}
@@ -153,9 +148,6 @@ const Header = () => {
 
                     {/* Searchbar */}
                     <div className="flex justify-center my-[10px] relative px-[16px]">
-                        <div className='hidden sm:block absolute left-[0px] top-1/2 -translate-y-1/2'>
-                            <MarketplaceIndicator/>
-                        </div>
                         <div className="relative w-full max-w-[400px] md:max-w-[550px] xl:max-w-[600px]">
                             <input
                             type="text"
@@ -180,7 +172,7 @@ const Header = () => {
                     {/* Left side: Categories */}
                     <div 
                         className="relative group cursor-pointer h-full flex justify-center"
-                        onMouseEnter={() => setCategoriesMenuOpen(true)}
+                        onClick={() => setCategoriesMenuOpen(true)}
                         onMouseLeave={() => setCategoriesMenuOpen(false)}
                     >
                         <p className="font-semibold text-[18px] flex items-center gap-2">

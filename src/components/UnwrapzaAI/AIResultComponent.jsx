@@ -1,27 +1,26 @@
 import { useEffect, useState } from "react";
 import SearchingAnimation from "../UnwrapzaAI/AISearchingAnimation"
-import AISkeletonCard from "./AISekeletonCard";
 import AICarousel from "./AICarousel";
 import { doc, getDoc } from "firebase/firestore";
 import { db } from "../../firebase";
+import AIInformation from "./AIInformation";
 
 const AIResultComponent = ({results, isSearching, setShowResults}) => {
     const [products, setProducts] = useState([]);
+    const BASE_API = import.meta.env.DEV ? "http://localhost:3000" : "";
 
     useEffect(() => {
         async function loadProducts() {
             if(!results || results.length === 0)return;
 
-            const loaded = []
+            const params = new URLSearchParams({
+                type: "ids",
+                ids: results.join(","),
+            });
 
-            for(let id of results){
-                const ref = doc(db, "products", id);
-                const snap = await getDoc(ref);
-                if(snap.exists()){
-                    loaded.push({ id, ...snap.data() })
-                }
-            }
-            setProducts(loaded);
+            const res = await fetch(`${BASE_API}/api/products?${params.toString()}`);
+            const data = await res.json();
+            setProducts(data.products || []);
         }
 
         loadProducts();
@@ -33,7 +32,7 @@ const AIResultComponent = ({results, isSearching, setShowResults}) => {
                 {!isSearching && (
                 <button
                     onClick={() => setShowResults(false)}
-                    className="md:hidden px-2 py-1 bg-white text-green font-bold 
+                    className="lg:hidden px-2 py-1 bg-white text-green font-bold 
                             rounded-lg shadow-[4px_4px_0_#ffffff] border-2 border-white
                             active:scale-95 transition-all"
                 >
@@ -45,7 +44,7 @@ const AIResultComponent = ({results, isSearching, setShowResults}) => {
             {isSearching && <SearchingAnimation/>}
 
             {!isSearching && products.length === 0 && (
-                <AISkeletonCard/>
+                <AIInformation/>
             )}
     
             {!isSearching && products.length > 0 && (
